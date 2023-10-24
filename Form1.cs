@@ -400,10 +400,21 @@ namespace timetable_app
         }
         public void OpenTasksFromFile()
         {
-            IFormatter formatter = new BinaryFormatter();
-            Stream stream = new FileStream(@"ExampleNew.dat", FileMode.Open, FileAccess.Read);
-     //Load the tasks into task from the stream
-            stream.Close();
+            var filePath = @"ExampleNew.dat";
+
+            if (!File.Exists(filePath))
+            {
+                var fileCreator = File.Create(filePath);
+                fileCreator.Close();
+            }
+            else //Load the tasks into task from the stream
+            {
+                IFormatter formatter = new BinaryFormatter();
+                Stream stream = new FileStream(@"ExampleNew.dat", FileMode.Open, FileAccess.Read);
+                stream.Close();
+            }
+     
+            
         }
 
         private void textBox2_TextChanged(object sender, EventArgs e)
