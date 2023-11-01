@@ -384,20 +384,22 @@ namespace timetable_app
                     TaskList.Items.Add(tasks[i].taskDescription);
 
                 }
+
+                //TaskList.Items.Add(tasks[i].taskDescription);
                 i++;
             }
         }
         public void SaveTasksToFile()
         {
-            IFormatter formatter = new BinaryFormatter();
+            BinaryFormatter formatter = new BinaryFormatter();
             Stream stream = new FileStream(@"ExampleNew.dat", FileMode.Create, FileAccess.Write);
-            /*foreach (Task t in tasks)
-            {
-                formatter.Serialize(stream, t); //this doesen't work with labels so I have to disable it when leables are enabled until I can fix it
-            }*/
-   
-            stream.Close();
+            //foreach (Task t in tasks)
+            //{
+            //    formatter.Serialize(stream, t); //this doesen't work with labels so I have to disable it when leables are enabled until I can fix it
+            //}
+            formatter.Serialize(stream, tasks);
         }
+
         public void OpenTasksFromFile()
         {
             var filePath = @"ExampleNew.dat";
@@ -409,12 +411,16 @@ namespace timetable_app
             }
             else //Load the tasks into task from the stream
             {
-                IFormatter formatter = new BinaryFormatter();
+                BinaryFormatter formatter = new BinaryFormatter();
                 Stream stream = new FileStream(@"ExampleNew.dat", FileMode.Open, FileAccess.Read);
+                tasks = (List<Task>)formatter.Deserialize(stream);
+
                 stream.Close();
             }
-     
-            
+            UpdateTaskListControl();
+
+
+
         }
 
         private void textBox2_TextChanged(object sender, EventArgs e)
@@ -423,12 +429,13 @@ namespace timetable_app
         }
     }
     [Serializable]
-    public class Task
+    public class Task : ISerializable
     {
         public string name;
         public double time;
         public DateTime scheduled;
         public bool completed;
+        [NonSerialized]
         public Label display; //this doesent' work with the saving feature so I comment out everything refrencing while I eneable the saving feature it until I can make them work together
         public double duration;
         public string taskDescription;
@@ -454,7 +461,7 @@ namespace timetable_app
             display.Text = name + ", " + (time - (time % 1)) + ":" + ((time % 1) * 60) + " - " + ((time + duration) - ((time + duration) % 1)) + ":" + (((time + duration) % 1) * 60) + ", " + scheduled.ToLongDateString();
             display.Width = 100 + 10 * Convert.ToInt32(duration); //change this based on length of task
             display.Height = 100;
-            display.Location = new Point(display.Location.X, display.Location.Y);
+         
             display.Location = new Point(100, 100);
             display.BackColor = Color.AliceBlue;
             display.BorderStyle = BorderStyle.Fixed3D;
@@ -470,7 +477,45 @@ namespace timetable_app
         {
 
         }
-        public List<Task> Ahead(List<Task> list)
+
+        //Constructor to load from file 
+        public Task(SerializationInfo information, StreamingContext context)
+        {
+            name = information.GetString("Name");
+            details = information.GetString("Details");
+            scheduled = information.GetDateTime("Scheduled");
+            completed = information.GetBoolean("Completed");
+            time = information.GetDouble("Time");
+            duration = information.GetDouble("Duration");
+            priority = information.GetInt16("Priority");
+            due = information.GetDateTime("Due");
+
+            display = new Label();
+            display.Text = name;
+            display.Width = 100 + (10 * Convert.ToInt32(duration)); //change this based on length of task
+            display.Height = 100;
+           
+            display.Location = new Point(100, 100);
+            display.BackColor = Color.AliceBlue;
+            display.BorderStyle = BorderStyle.Fixed3D;
+
+        }
+        public void GetObjectData(SerializationInfo information, StreamingContext context)
+        {
+      
+            information.AddValue("Name", name);
+            information.AddValue("Details", details);
+            information.AddValue("Scheduled", scheduled);
+            information.AddValue("Completed", completed);
+            information.AddValue("Time", time);
+            information.AddValue("Duration", duration);
+            information.AddValue("Priority", priority);
+            information.AddValue("Due", due);
+
+
+        }
+    
+    public List<Task> Ahead(List<Task> list)
         {
             list[0].EFT = list[0].EST + list[0].duration;
             int i = 1;
