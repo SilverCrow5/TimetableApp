@@ -413,14 +413,40 @@ namespace timetable_app
             {
                 BinaryFormatter formatter = new BinaryFormatter();
                 Stream stream = new FileStream(@"ExampleNew.dat", FileMode.Open, FileAccess.Read);
-                tasks = (List<Task>)formatter.Deserialize(stream);
+                if (stream.Length > 0)
+                {
+                    tasks = (List<Task>)formatter.Deserialize(stream);
+                }
 
                 stream.Close();
+                
             }
             UpdateTaskListControl();
 
 
 
+        }
+        public void DeleteTasksFromFile(Task t)
+        {
+            BinaryFormatter formatter = new BinaryFormatter();
+            Stream stream = new FileStream(@"ExampleNew.dat", FileMode.Create, FileAccess.ReadWrite);
+            if (File.Exists(@"ExampleNew.dat"))
+            {
+                String[] contentsArray = File.ReadAllLines(@"ExampleNew.dat");
+                List<string> contentsList = new List<string>();
+                foreach (string contents in contentsArray)
+                {
+                    contentsList.Add(contents);
+                }
+                foreach (string a in contentsList)
+                {
+                    if (a == Convert.ToString(t))
+                    {
+                        contentsList.Remove(a);
+                    }
+                }
+                File.WriteAllLines(@"ExampleNew.dat", contentsList);
+            }
         }
 
         private void textBox2_TextChanged(object sender, EventArgs e)
