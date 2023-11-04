@@ -55,6 +55,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scripts\task.cs" />
     <Compile Include="TaskEditForm.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -53,10 +53,6 @@ namespace timetable_app
         {
             TaskList.PreviewKeyDown += TaskList_KeyDown;
             OpenTasksFromFile();
-            button1.Visible = false;
-            button1.Enabled = false;
-            textBox2.Visible = false;
-            textBox2.Enabled = false;
         }
 
 
@@ -320,8 +316,8 @@ namespace timetable_app
                 {
                     tasks[j].scheduled = DateTime.Today;
                     tasks[j].time = 0;
-                    tasks[j].Ahead(tasks);
-                    tasks[j].Behind(tasks);
+                    //tasks[j].Ahead(tasks);
+                    //tasks[j].Behind(tasks);
                     int k = 0;
                     while (k < j)
                     {
