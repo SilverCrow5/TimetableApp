@@ -81,6 +81,7 @@ namespace timetable_app
                     completedTasks.Add(current);
                     TaskList.Items.Remove(current.taskDescription);
                     this.Controls.Remove(current.display);
+                    SaveTasksToFile();
                     if (tasks.Count != 0)
                     {
                         OrderTasks();
@@ -398,6 +399,7 @@ namespace timetable_app
             //    formatter.Serialize(stream, t); //this doesen't work with labels so I have to disable it when leables are enabled until I can fix it
             //}
             formatter.Serialize(stream, tasks);
+            stream.Close();
         }
 
         public void OpenTasksFromFile()
@@ -429,13 +431,14 @@ namespace timetable_app
         public void DeleteTasksFromFile(Task t)
         {
             BinaryFormatter formatter = new BinaryFormatter();
-            Stream stream = new FileStream(@"ExampleNew.dat", FileMode.Create, FileAccess.ReadWrite);
+            //Stream stream = new FileStream(@"ExampleNew.dat", FileMode.Create, FileAccess.ReadWrite);
             if (File.Exists(@"ExampleNew.dat"))
             {
                 String[] contentsArray = File.ReadAllLines(@"ExampleNew.dat");
                 List<string> contentsList = new List<string>();
                 foreach (string contents in contentsArray)
                 {
+                    
                     contentsList.Add(contents);
                 }
                 foreach (string a in contentsList)
@@ -484,14 +487,14 @@ namespace timetable_app
             this.duration = duration;
             this.time = time;
             display = new Label();
-            display.Text = name + ", " + (time - (time % 1)) + ":" + ((time % 1) * 60) + " - " + ((time + duration) - ((time + duration) % 1)) + ":" + (((time + duration) % 1) * 60) + ", " + scheduled.ToLongDateString();
+            display.Text = name + ", " + (time - (time % 1)) + ":" + (time % 1 * 60) + " - " + ((time + duration) - ((time + duration) % 1)) + ":" + (((time + duration) % 1) * 60) + ", " + scheduled.ToLongDateString();
             display.Width = 100 + 10 * Convert.ToInt32(duration); //change this based on length of task
             display.Height = 100;
          
             display.Location = new Point(100, 100);
             display.BackColor = Color.AliceBlue;
             display.BorderStyle = BorderStyle.Fixed3D;
-            taskDescription = name + ", " + (time % 1) + ":" + ((time - (time % 1)) * 60) + " - " + ((time + duration) % 1) + ":" + ((time + duration) % 1 /100 *60) + ", " + scheduled.ToLongDateString();
+            taskDescription = name + ", " + (time - (time % 1)) + ":" + (time % 1 * 60) + " - " + ((time + duration) - (time + duration) % 1) + ":" + ((time + duration) % 1 * 60) + ", " + scheduled.ToLongDateString();
             this.taskDescription = taskDescription;
             this.priority = priority;
             this.due = due;
