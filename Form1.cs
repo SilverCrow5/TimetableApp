@@ -82,8 +82,9 @@ namespace timetable_app
                     {
                         OrderTasks();
                         UpdateTaskListControl();
+                        OrderDisplay();
                     }
-                    int j = 0;
+                    /*int j = 0;
                     while (j < tasks.Count)
                     {
                         foreach (object s in TaskList.Items)
@@ -131,18 +132,19 @@ namespace timetable_app
                                         {
                                             tasks[j].display.Location = new Point(Convert.ToInt32(tasks[j - 1].display.Location.X) + Convert.ToInt32(tasks[j - 1].display.Width), 400);
                                         }
-                                    }*/
+                                    }* /
                                     this.Controls.Add(tasks[j].display);
                                     tasks[j].display.Text = tasks[j].name + ", " + (tasks[j].time - (tasks[j].time % 1)) + ":" + (tasks[j].time % 1 * 60) + " - " + ((tasks[j].time + tasks[j].duration) - ((tasks[j].time + tasks[j].duration) % 1)) + ":" + ((tasks[j].time + tasks[j].duration) % 1 * 60) + ", " + tasks[j].scheduled.ToLongDateString();
                                 }
                             }
                         }
                         j++;
-                    }
+                    }*/
                     if (tasks.Count != 0)
                     {
                         OrderTasks();
                         UpdateTaskListControl();
+                        OrderDisplay();
                     }
                 }
                 if (e.KeyData == Keys.Enter)
@@ -162,6 +164,7 @@ namespace timetable_app
                             }
                             k++;
                         }
+                        OrderDisplay();
                         current.display.Location = new Point(Convert.ToInt32(tasks[previous].display.Location.X) + Convert.ToInt32(tasks[previous].display.Width), Convert.ToInt32(tasks[previous].display.Location.Y));
 
 
@@ -215,8 +218,10 @@ namespace timetable_app
             //    }
             //    i++;
             //}
+            OrderTasks();
             UpdateTaskListControl();
-            int j = 0;
+            OrderDisplay();
+            /*int j = 0;
             while (j < tasks.Count)
             {
                 if(tasks[j].display.Created == true)
@@ -263,7 +268,7 @@ namespace timetable_app
 
                 }
                 j++;
-            }
+            }*/
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -384,6 +389,46 @@ namespace timetable_app
 
                 //TaskList.Items.Add(tasks[i].taskDescription);
                 i++;
+            }
+        }
+        public void OrderDisplay()
+        {
+            foreach(Task t in tasks)
+            {
+                foreach(object s in TaskList.Items)
+                {
+                    if(Convert.ToString(s) == t.taskDescription)
+                    {
+                        Task previous = t;
+                        if (TaskList.Items.IndexOf(s) == 0)
+                        {
+                            t.display.Location = new Point(100, 100);
+                        }
+                        else
+                        {
+                            foreach(Task u in tasks)
+                            {
+                                if(u.taskDescription == Convert.ToString(TaskList.Items[TaskList.Items.IndexOf(s) - 1]))
+                                {
+                                    previous = u;
+                                }
+                            }
+                            t.display.Location = new Point(Convert.ToInt32(previous.display.Location.X) + Convert.ToInt32(previous.display.Width), Convert.ToInt32(previous.display.Location.Y));
+                            if (t.display.Location.X > 500)
+                            {
+                                t.display.Location = new Point(100, Convert.ToInt32(previous.display.Location.Y + 100));
+                            }
+                        }
+                        if (t.display.Created == true)
+                        {
+                            this.Controls.Remove(t.display);
+                            if (dateTimePicker1.Value.Date == t.scheduled.Date)
+                            {
+                                this.Controls.Add(t.display);
+                            }
+                        }
+                    }
+                }
             }
         }
         public void SaveTasksToFile()
@@ -600,7 +645,7 @@ namespace timetable_app
         }
 
     }
-    class Calendar
+    public class Calendar
     {
 
     }
