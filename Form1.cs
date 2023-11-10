@@ -53,6 +53,9 @@ namespace timetable_app
         {
             TaskList.PreviewKeyDown += TaskList_KeyDown;
             OpenTasksFromFile();
+            OrderTasks();
+            UpdateTaskListControl();
+            OrderDisplay();
         }
 
 
