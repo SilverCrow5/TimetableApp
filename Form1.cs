@@ -80,6 +80,7 @@ namespace timetable_app
                     completedTasks.Add(current);
                     TaskList.Items.Remove(current.taskDescription);
                     this.Controls.Remove(current.display);
+                    DeleteTasksFromFile(current);
                     SaveTasksToFile();
                     if (tasks.Count != 0)
                     {
@@ -316,7 +317,7 @@ namespace timetable_app
             if (tasks.Count > 0)
             {
                 Task lastAdded = tasks[tasks.Count - 1];
-                tasks = tasks.OrderByDescending(x => x.priority).ThenByDescending(x => x.duration).ToList();
+                tasks = tasks.OrderByDescending(x => x.priority).ThenByDescending(x => x.EST).ThenByDescending(x => x.duration).ToList();
                 tasks[0].time = 0;
                 int j = 0;
 
@@ -324,8 +325,8 @@ namespace timetable_app
                 {
                     tasks[j].scheduled = DateTime.Today;
                     tasks[j].time = 0;
-                    //tasks[j].Ahead(tasks);
-                    //tasks[j].Behind(tasks);
+                    tasks[j].Ahead(tasks);
+                    tasks[j].Behind(tasks);
                     int k = 0;
                     while (k < j)
                     {
@@ -496,6 +497,35 @@ namespace timetable_app
             }
         }
 
+        public void Clearing(List<Task> tasks)
+        {
+            foreach (Task t in tasks)
+            {
+                if (t.due.DayOfYear < DateTime.Now.DayOfYear)
+                {
+                    this.Controls.Remove(t.display);
+                    completedTasks.Add(t);
+                    tasks.Remove(t);
+                    TaskList.Items.Remove(t.taskDescription);
+                    this.Controls.Remove(t.display);
+                    DeleteTasksFromFile(t);
+                    SaveTasksToFile();
+                    if (tasks.Count != 0)
+                    {
+                        OrderTasks();
+                        UpdateTaskListControl();
+                        OrderDisplay();
+                    }
+                }
+                if(t.scheduled.DayOfYear < DateTime.Now.DayOfYear)
+                {
+                    OrderTasks();
+                    UpdateTaskListControl();
+                    OrderDisplay();
+                }
+            }
+        }
+
         private void textBox2_TextChanged(object sender, EventArgs e)
         {
 
@@ -594,11 +624,14 @@ namespace timetable_app
             int i = 1;
             while (i < list.Count)
             {
-                foreach (Task t in list[i].predecessors)
+                if (list[i].predecessors != null)
                 {
-                    if (list[i].EST < t.EFT)
+                    foreach (Task t in list[i].predecessors)
                     {
-                        list[i].EST = t.EFT;
+                        if (list[i].EST < t.EFT)
+                        {
+                            list[i].EST = t.EFT;
+                        }
                     }
                 }
                 list[i].EFT = list[i].EST + list[i].duration;
@@ -613,17 +646,20 @@ namespace timetable_app
             int i = list.Count - 2;
             while (i >= 0)
             {
-                foreach (Task t in list[i].successors)
+                if (list[i].successors != null)
                 {
-                    if (list[i].LFT == 0)
+                    foreach (Task t in list[i].successors)
                     {
-                        list[i].LFT = t.LST;
-                    }
-                    else
-                    {
-                        if (list[i].LFT > t.LST)
+                        if (list[i].LFT == 0)
                         {
                             list[i].LFT = t.LST;
+                        }
+                        else
+                        {
+                            if (list[i].LFT > t.LST)
+                            {
+                                list[i].LFT = t.LST;
+                            }
                         }
                     }
                 }

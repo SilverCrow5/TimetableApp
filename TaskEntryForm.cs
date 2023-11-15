@@ -55,9 +55,12 @@ namespace timetable_app
             //form.TaskList.Items.Add(task.taskDescription); // this is supposed to add it to the list box but won't work and I keep it as a reminder
             sendingForm.tasks.Add(task);
 
-            //task.Ahead(sendingForm.tasks);
-            //task.Behind(sendingForm.tasks);
-            //task.CritPath(sendingForm.tasks);
+            if (task.successors != null && task.predecessors != null)
+            {
+                task.Ahead(sendingForm.tasks);
+                task.Behind(sendingForm.tasks);
+                task.CritPath(sendingForm.tasks);
+            }
 
 
             //https://code-maze.com/sort-list-by-object-property-dotnet/
