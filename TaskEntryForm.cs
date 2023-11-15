@@ -17,10 +17,12 @@ namespace timetable_app
     public partial class TaskEntryForm : Form
     {
         Form1 sendingForm;
-        public TaskEntryForm(Form1 mainForm)
+        Calendar calendar;
+        public TaskEntryForm(Form1 sendingForm, Calendar calendar)
         {
             InitializeComponent();
-            this.sendingForm = mainForm;
+            this.calendar = calendar;
+            this.sendingForm = sendingForm;
             this.UpdateTaskSelector();
         }
 
@@ -40,7 +42,7 @@ namespace timetable_app
             
             foreach (object o in priotiryTaskSelecter.CheckedItems)
             {
-                foreach (Task t in sendingForm.tasks)
+                foreach (Task t in calendar.GetTasks())
                 {
                     if (t.taskDescription == o.ToString())
                     {
@@ -53,7 +55,7 @@ namespace timetable_app
             }
 
             //form.TaskList.Items.Add(task.taskDescription); // this is supposed to add it to the list box but won't work and I keep it as a reminder
-            sendingForm.tasks.Add(task);
+            calendar.GetTasks().Add(task);
 
             if (task.successors != null && task.predecessors != null)
             {
@@ -66,9 +68,9 @@ namespace timetable_app
             //https://code-maze.com/sort-list-by-object-property-dotnet/
             //sendingForm.tasks = sendingForm.tasks.OrderBy(x => x.name).ThenBy(x=>x.priority)ToList();
 
-            sendingForm.OrderTasks();
-            sendingForm.UpdateTaskListControl();
-            sendingForm.SaveTasksToFile();
+            calendar.OrderTasks();
+            calendar.UpdateTaskListControl(sendingForm);
+            calendar.SaveTasksToFile();
             Close();
         }
         private void TaskEntryForm_KeyDown(object sender, PreviewKeyDownEventArgs e)
@@ -84,8 +86,8 @@ namespace timetable_app
                 int time = 0;
                 Task task = new Task(taskName, description, DateTime.Now, false, time, duration, priority, dateDue);
                 sendingForm.tasks.Add(task);
-                sendingForm.OrderTasks();
-                sendingForm.UpdateTaskListControl();
+                calendar.OrderTasks();
+                calendar.UpdateTaskListControl(sendingForm);
                 Close();
             }
             if (e.KeyData == Keys.Escape)
@@ -97,7 +99,7 @@ namespace timetable_app
         public void UpdateTaskSelector()
         {
             priotiryTaskSelecter.Items.Clear();
-            foreach (Task t in sendingForm.tasks)
+            foreach (Task t in calendar.GetTasks())
             {
                 t.taskDescription = t.name + ", " + (t.time - (t.time % 1)) + ":" + (t.time % 1 * 60) + " - " + ((t.time + t.duration) - ((t.time + t.duration) % 1)) + ":" + ((t.time + t.duration) % 1 * 60) + ", " + t.scheduled.ToLongDateString();
                 if (t.due.DayOfYear >= dateTimePicker1.Value.DayOfYear)

@@ -27,12 +27,15 @@ namespace timetable_app
             textBox3.Text = Convert.ToString(t.duration);
             textBox4.Text = Convert.ToString(t.time - (t.time % 1)) + ":" + Convert.ToString(t.time % 1 * 60);
             textBox5.Text = Convert.ToString(t.priority);
-            foreach (Task u in mainForm.tasks)
+            if (t.predecessors != null)
             {
-                checkedListBox1.Items.Add(u);
-                if (t.predecessors.Contains(u))
+                foreach (Task u in mainForm.GetCalendar().GetTasks())
                 {
-                    checkedListBox1.SetItemChecked(checkedListBox1.Items.IndexOf(u), true);
+                    checkedListBox1.Items.Add(u);
+                    if (t.predecessors.Contains(u))
+                    {
+                        checkedListBox1.SetItemChecked(checkedListBox1.Items.IndexOf(u), true);
+                    }
                 }
             }
         }
@@ -50,14 +53,14 @@ namespace timetable_app
             t.duration = Convert.ToInt32(textBox3.Text);
             t.priority = Convert.ToInt32(textBox5.Text);
             t.predecessors.Clear();
-            foreach(Task v in mainForm.tasks)
+            foreach (Task v in mainForm.GetCalendar().GetTasks())
             {
-                if(v.successors.Contains(t))
+                if (v.successors.Contains(t))
                 {
                     v.successors.Remove(t);
                 }
             }
-            foreach(Task u in checkedListBox1.CheckedItems)
+            foreach (Task u in checkedListBox1.CheckedItems)
             {
                 t.predecessors.Add(u);
                 u.successors.Add(t);
@@ -67,7 +70,9 @@ namespace timetable_app
 
         private void button2_Click(object sender, EventArgs e)
         {
+            
             Close();
+
         }
     }
 }
