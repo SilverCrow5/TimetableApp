@@ -589,39 +589,51 @@ namespace timetable_app
             }
         }
 
-        /*   public void Clearing(List<Task> tasks)
+           public void Clearing(List<Task> tasks, Form1 form, Calendar calendar)
            {
                foreach (Task t in tasks)
                {
                    if (t.due.DayOfYear < DateTime.Now.DayOfYear)
                    {
-                       this.Controls.Remove(t.display);
+                       form.Controls.Remove(t.display);
                        completedTasks.Add(t);
                        tasks.Remove(t);
-                       TaskList.Items.Remove(t.taskDescription);
-                       this.Controls.Remove(t.display);
+                       form.TaskList.Items.Remove(t.taskDescription);
+                       form.Controls.Remove(t.display);
                        DeleteTasksFromFile(t);
                        SaveTasksToFile();
                        if (tasks.Count != 0)
                        {
-                           OrderTasks();
-                           UpdateTaskListControl();
-                           OrderDisplay();
+                           calendar.OrderTasks();
+                           calendar.UpdateTaskListControl(form);
+                           calendar.OrderDisplay(form);
                        }
                    }
                    if (t.scheduled.DayOfYear < DateTime.Now.DayOfYear)
                    {
-                       OrderTasks();
-                       UpdateTaskListControl();
-                       OrderDisplay();
+                       calendar.OrderTasks();
+                       calendar.UpdateTaskListControl(form);
+                       calendar.OrderDisplay(form);
                    }
                }
-           } */
+           }
     }
 
     public class BusyTime
     {
         int startTime;
+        int endTime;
+        int duration;
+        bool repeating;
+        string day;
+        DateTime date;
+        public BusyTime(int startTime, int duration, bool repeating, DateTime date)
+        {
+            this.startTime = startTime;
+            this.duration = duration;
+            this.repeating = repeating;
+            this.date = date;
+        }
     }
 
     public class Event : Task
