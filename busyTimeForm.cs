@@ -12,14 +12,24 @@ namespace timetable_app
 {
     public partial class busyTimeForm : Form
     {
-        public busyTimeForm()
+        Form1 sendingForm;
+        Calendar calendar;
+        public busyTimeForm(Form1 sendingForm, Calendar calendar)
         {
             InitializeComponent();
+            this.calendar = calendar;
+            this.sendingForm = sendingForm;
         }
 
         private void busyTimeForm_Load(object sender, EventArgs e)
         {
 
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            BusyTime one = new BusyTime("Text", DateTime.Now, false, 0, 0, 0, false, DateTime.Now);
+            calendar.GetTasks.().Add(one);
         }
     }
 }

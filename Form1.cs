@@ -217,7 +217,7 @@ namespace timetable_app
 
         private void button1_Click_1(object sender, EventArgs e)
         {
-            var frm = new busyTimeForm();
+            var frm = new busyTimeForm(this, calendar);
             frm.ShowDialog();
         }
     }
@@ -625,20 +625,30 @@ namespace timetable_app
            }
     }
 
-    public class BusyTime
+    public class BusyTime : Task
     {
-        int startTime;
-        int endTime;
-        int duration;
-        bool repeating;
-        string day;
-        DateTime date;
-        public BusyTime(int startTime, int duration, bool repeating, DateTime date)
+        public int startTime;
+        public int endTime;
+        public double duration;
+        public bool repeating;
+        public string day;
+        public DateTime date;
+        public Label display;
+        public BusyTime(string name, DateTime scheduled, bool completed, double time, double duration, int startTime, bool repeating, DateTime date) : base(name, scheduled, duration, time, completed)
         {
             this.startTime = startTime;
             this.duration = duration;
             this.repeating = repeating;
             this.date = date;
+
+            display = new Label();
+            display.Text = "example";
+            display.Width = 100 + 10 * Convert.ToInt32(duration); //change this based on length of task
+            display.Height = 100;
+
+            display.Location = new Point(100, 100);
+            display.BackColor = Color.Red;
+            display.BorderStyle = BorderStyle.Fixed3D;
         }
     }
 
