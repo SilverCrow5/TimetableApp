@@ -174,17 +174,6 @@ namespace timetable_app
 
         private void button1_Click(object sender, EventArgs e)
         {
-            //MessageBox.Show("you can enter stuff when I get my shit together");
-            /*DateTime d = DateTime.Now; OLD STUFF
-            Task task = new Task(textBox2.Text, d, false, 13, 2, 1);
-            tasks.Add(task);
-            if (Convert.ToDateTime(dateTimePicker1.Text).Date == d.Date)
-            {
-                if (task.completed == false)
-                {
-                    this.Controls.Add(task.display);
-                }
-            }*/
 
         }
 
@@ -421,56 +410,59 @@ namespace timetable_app
 
                 while (j < tasks.Count)
                 {
-                    tasks[j].scheduled = DateTime.Today;
-                    tasks[j].time = 0;
-                    tasks[j].Ahead(tasks);
-                    tasks[j].Behind(tasks);
-                    int k = 0;
-                    while (k < j)
+                    if (tasks[j] != BusyTime)
                     {
-                        if (tasks[j].scheduled.DayOfYear == tasks[k].scheduled.DayOfYear)
+                        tasks[j].scheduled = DateTime.Today;
+                        tasks[j].time = 0;
+                        tasks[j].Ahead(tasks);
+                        tasks[j].Behind(tasks);
+                        int k = 0;
+                        while (k < j)
                         {
-                            tasks[j].time = tasks[k].time + tasks[k].duration;
-                        }
-                        k++;
-                    }
-                    if (tasks[j].time + tasks[j].duration > 24)
-                    {
-                        if (tasks[j].scheduled.AddDays(1).DayOfYear <= tasks[j].due.DayOfYear)
-                        {
-                            tasks[j].scheduled = tasks[j].scheduled.AddDays(1);
-                            tasks[j].time = 0;
-                            int l = 0;
-                            while (l < j)
+                            if (tasks[j].scheduled.DayOfYear == tasks[k].scheduled.DayOfYear)
                             {
-                                if (tasks[j].scheduled.DayOfYear == tasks[l].scheduled.DayOfYear)
-                                {
-                                    tasks[j].time = tasks[l].time + tasks[l].duration;
-                                }
-                                l++;
+                                tasks[j].time = tasks[k].time + tasks[k].duration;
                             }
+                            k++;
                         }
-                        else
+                        if (tasks[j].time + tasks[j].duration > 24)
                         {
-                            MessageBox.Show("There is not enough time to schedule them all");
-                            tasks.Remove(lastAdded);
+                            if (tasks[j].scheduled.AddDays(1).DayOfYear <= tasks[j].due.DayOfYear)
+                            {
+                                tasks[j].scheduled = tasks[j].scheduled.AddDays(1);
+                                tasks[j].time = 0;
+                                int l = 0;
+                                while (l < j)
+                                {
+                                    if (tasks[j].scheduled.DayOfYear == tasks[l].scheduled.DayOfYear)
+                                    {
+                                        tasks[j].time = tasks[l].time + tasks[l].duration;
+                                    }
+                                    l++;
+                                }
+                            }
+                            else
+                            {
+                                MessageBox.Show("There is not enough time to schedule them all");
+                                tasks.Remove(lastAdded);
+                            }
+                            //OrderTasks(); makes it all go wrong
                         }
-                        //OrderTasks(); makes it all go wrong
-                    }
-                    int i = 0;
-                    while (i < j)
-                    {
-                        if (tasks[j].scheduled.DayOfYear == tasks[i].scheduled.DayOfYear)
+                        int i = 0;
+                        while (i < j)
                         {
-                            tasks[j].time = tasks[i].time + tasks[i].duration;
+                            if (tasks[j].scheduled.DayOfYear == tasks[i].scheduled.DayOfYear)
+                            {
+                                tasks[j].time = tasks[i].time + tasks[i].duration;
+                            }
+                            i++;
                         }
-                        i++;
+                        if (j < tasks.Count && tasks.Count != 0)
+                        {
+                            tasks[j].taskDescription = tasks[j].name + ", " + (tasks[j].time - (tasks[j].time % 1)) + ":" + (tasks[j].time % 1 * 60) + " - " + ((tasks[j].time + tasks[j].duration) - (tasks[j].time + tasks[j].duration % 1)) + ":" + ((tasks[j].time + tasks[j].duration) % 1 * 60) + ", " + tasks[j].scheduled.ToLongDateString();
+                        }
+                        j++;
                     }
-                    if (j < tasks.Count && tasks.Count != 0)
-                    {
-                        tasks[j].taskDescription = tasks[j].name + ", " + (tasks[j].time - (tasks[j].time % 1)) + ":" + (tasks[j].time % 1 * 60) + " - " + ((tasks[j].time + tasks[j].duration) - (tasks[j].time + tasks[j].duration % 1)) + ":" + ((tasks[j].time + tasks[j].duration) % 1 * 60) + ", " + tasks[j].scheduled.ToLongDateString();
-                    }
-                    j++;
                 }
             }
 

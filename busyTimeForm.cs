@@ -29,7 +29,8 @@ namespace timetable_app
         private void button1_Click(object sender, EventArgs e)
         {
             BusyTime one = new BusyTime("Text", DateTime.Now, false, 0, 0, 0, false, DateTime.Now);
-            calendar.GetTasks.().Add(one);
+            Calendar calendar = sendingForm.GetCalendar();
+            calendar.GetTasks().Add(one);
         }
     }
 }
