@@ -101,7 +101,7 @@ namespace timetable_app
                     }
                 }
                 if (e.KeyData == Keys.Enter)
-                {
+                {                    
                     this.Controls.Add(current.display);
                     if (TaskList.SelectedIndex > 0)
                     {
@@ -482,7 +482,7 @@ namespace timetable_app
             while (i < tasks.Count)
             {
                 tasks[i].taskDescription = tasks[i].name + ", " + (tasks[i].time - (tasks[i].time % 1)) + ":" + (tasks[i].time % 1 * 60) + " - " + ((tasks[i].time + tasks[i].duration) - ((tasks[i].time + tasks[i].duration) % 1)) + ":" + ((tasks[i].time + tasks[i].duration) % 1 * 60) + ", " + tasks[i].scheduled.ToLongDateString();
-                if (tasks[i].scheduled.DayOfYear == form.dateTimePicker1.Value.DayOfYear)
+                if (tasks[i].scheduled.DayOfYear == form.dateTimePicker1.Value.DayOfYear && tasks[i].GetType() != typeof(BusyTime))
                 {
                     form.TaskList.Items.Add(tasks[i].taskDescription);
 
@@ -634,14 +634,17 @@ namespace timetable_app
         public List<DateTime> repeatDates;
         public DateTime repeatEndDate;
         public Label display;
-        public BusyTime(string name, DateTime scheduled, bool completed, double time, double duration, int startTime, bool repeating) : base(name, scheduled, duration, time, completed)
+        public BusyTime(string name, DateTime scheduled, bool completed, double time, double duration, bool repeating) : base(name, scheduled, duration, time, completed)
         {
+            startTime = Convert.ToInt32(time);
             this.startTime = startTime;
             this.duration = duration;
             this.repeating = repeating;
             this.repeatEndDate = repeatEndDate;
             this.daysofWeek = daysofWeek;
             this.repeatDates = repeatDates;
+            this.endTime = endTime;
+
 
             display = new Label();
             display.Text = "example";
