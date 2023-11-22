@@ -26,6 +26,7 @@ namespace timetable_app
         Pen pen;
         Graphics graphics;
         public List<Task> tasks;
+        public List<BusyTime> busyTimes;
         public int i = 1;
         public List<Task> completedTasks;
 
@@ -375,17 +376,22 @@ namespace timetable_app
     public class Calendar
     {
         private List<Task> tasks;
-
+        private List<BusyTime> busyTimes;
         private List<Task> completedTasks;
 
         public Calendar()
         {
             tasks = new List<Task>();
             completedTasks = new List<Task>();
+            busyTimes = new List<BusyTime>();
         }
         public List<Task> GetTasks()
         {
             return tasks;
+        }
+        public List<BusyTime> GetBusyTime()
+        {
+            return busyTimes;
         }
         public List<Task> GetCompletedTasks()
         {
@@ -410,7 +416,7 @@ namespace timetable_app
 
                 while (j < tasks.Count)
                 {
-                    if (tasks[j] != BusyTime)
+                    if (tasks[j].GetType() != typeof(BusyTime))
                     {
                         tasks[j].scheduled = DateTime.Today;
                         tasks[j].time = 0;
@@ -461,9 +467,10 @@ namespace timetable_app
                         {
                             tasks[j].taskDescription = tasks[j].name + ", " + (tasks[j].time - (tasks[j].time % 1)) + ":" + (tasks[j].time % 1 * 60) + " - " + ((tasks[j].time + tasks[j].duration) - (tasks[j].time + tasks[j].duration % 1)) + ":" + ((tasks[j].time + tasks[j].duration) % 1 * 60) + ", " + tasks[j].scheduled.ToLongDateString();
                         }
-                        j++;
                     }
+                    j++;
                 }
+                tasks.OrderByDescending(x => x.time);
             }
 
 
@@ -623,15 +630,18 @@ namespace timetable_app
         public int endTime;
         public double duration;
         public bool repeating;
-        public string day;
-        public DateTime date;
+        public List<string> daysofWeek;
+        public List<DateTime> repeatDates;
+        public DateTime repeatEndDate;
         public Label display;
-        public BusyTime(string name, DateTime scheduled, bool completed, double time, double duration, int startTime, bool repeating, DateTime date) : base(name, scheduled, duration, time, completed)
+        public BusyTime(string name, DateTime scheduled, bool completed, double time, double duration, int startTime, bool repeating) : base(name, scheduled, duration, time, completed)
         {
             this.startTime = startTime;
             this.duration = duration;
             this.repeating = repeating;
-            this.date = date;
+            this.repeatEndDate = repeatEndDate;
+            this.daysofWeek = daysofWeek;
+            this.repeatDates = repeatDates;
 
             display = new Label();
             display.Text = "example";
@@ -641,6 +651,21 @@ namespace timetable_app
             display.Location = new Point(100, 100);
             display.BackColor = Color.Red;
             display.BorderStyle = BorderStyle.Fixed3D;
+        }
+        public void setRepeatDates()
+        {
+            DateTime i = DateTime.Now;
+            while(i.DayOfYear < repeatEndDate.DayOfYear)
+            {
+                foreach(string s in daysofWeek)
+                {
+                    if(i.DayOfWeek.ToString() == s)
+                    {
+                        repeatDates.Add(i);
+                    }
+                }
+                i.AddDays(1);
+            }
         }
     }
 
