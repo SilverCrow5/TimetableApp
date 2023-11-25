@@ -18,6 +18,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 using System.Xml.Linq;
+using timetable_app.AppLogic;
 
 namespace timetable_app
 {
@@ -25,10 +26,10 @@ namespace timetable_app
     {
         Pen pen;
         Graphics graphics;
-        public List<Task> tasks;
+        public List<AppLogic.Task> tasks;
         public List<BusyTime> busyTimes;
         public int i = 1;
-        public List<Task> completedTasks;
+        public List<AppLogic.Task> completedTasks;
 
         Calendar calendar;
         TableLayoutPanel layoutPanel;
@@ -40,12 +41,12 @@ namespace timetable_app
             DateTime now = DateTime.Now;
             graphics = this.CreateGraphics();
             pen = new Pen(Brushes.Black);
-            tasks = new List<Task>();
-            completedTasks = new List<Task>();
+            tasks = new List<AppLogic.Task>();
+            completedTasks = new List<AppLogic.Task>();
             calendar = new Calendar();
             textBox1.Text = Convert.ToString(now.DayOfWeek);
             
-            void display(Task one)
+            void display(AppLogic.Task one)
             {
                 this.TaskList.Items.Add(one);
             }
@@ -68,14 +69,14 @@ namespace timetable_app
             if (TaskList.SelectedItem != null)
             {
                 int i = 0;
-                foreach (Task t in calendar.GetTasks())
+                foreach (AppLogic.Task t in calendar.GetTasks())
                 {
                     if (t.taskDescription == (String)TaskList.SelectedItem)
                     {
                         i = calendar.GetTasks().IndexOf(t);
                     }
                 }
-                Task current = calendar.GetTasks()[i];
+                AppLogic.Task current = calendar.GetTasks()[i];
                 if (e.KeyData == Keys.Delete)
                 {
                     this.Controls.Remove(current.display);
@@ -157,7 +158,7 @@ namespace timetable_app
 
 
         }
-        public void update(List<Task> list)
+        public void update(List<AppLogic.Task> list)
         {
 
         }
@@ -190,7 +191,7 @@ namespace timetable_app
             frm.ShowDialog();
         }
 
-        public void display(Task one)
+        public void display(AppLogic.Task one)
         {
             this.TaskList.Items.Add(one.taskDescription);
         }
@@ -211,6 +212,7 @@ namespace timetable_app
             frm.ShowDialog();
         }
     }
+    /*
     [Serializable]
     public class Task : ISerializable
     {
@@ -306,7 +308,7 @@ namespace timetable_app
                 int i = 1;
                 while (i < list.Count)
                 {
-                    if (list[i].predecessors != null)
+                    if (list[i].predecessors.Count != 0)
                     {
                         foreach (Task t in list[i].predecessors)
                         {
@@ -331,7 +333,7 @@ namespace timetable_app
                 int i = list.Count - 2;
                 while (i >= 0)
                 {
-                    if (list[i].successors != null)
+                    if (list[i].successors.Count != 0)
                     {
                         foreach (Task t in list[i].successors)
                         {
@@ -373,19 +375,21 @@ namespace timetable_app
         }
 
     }
+    */
+
     public class Calendar
     {
-        private List<Task> tasks;
+        private List<AppLogic.Task> tasks;
         private List<BusyTime> busyTimes;
-        private List<Task> completedTasks;
+        private List<AppLogic.Task> completedTasks;
 
         public Calendar()
         {
-            tasks = new List<Task>();
-            completedTasks = new List<Task>();
+            tasks = new List<AppLogic.Task>();
+            completedTasks = new List<AppLogic.Task>();
             busyTimes = new List<BusyTime>();
         }
-        public List<Task> GetTasks()
+        public List<AppLogic.Task> GetTasks()
         {
             return tasks;
         }
@@ -393,15 +397,15 @@ namespace timetable_app
         {
             return busyTimes;
         }
-        public List<Task> GetCompletedTasks()
+        public List<AppLogic.Task> GetCompletedTasks()
         {
             return completedTasks;
         }
-        public void AddTask(Task t)
+        public void AddTask(AppLogic.Task t)
         {
             tasks.Add(t);
         }
-        public void AddCompletedTask(Task t)
+        public void AddCompletedTask(AppLogic.Task t)
         {
             completedTasks.Add(t);
         }
@@ -409,7 +413,7 @@ namespace timetable_app
         {
             if (tasks.Count > 0)
             {
-                Task lastAdded = tasks[tasks.Count - 1];
+                AppLogic.Task lastAdded = tasks[tasks.Count - 1];
                 tasks = tasks.OrderByDescending(x => x.priority).ThenByDescending(x => x.EST).ThenByDescending(x => x.duration).ToList();
                 tasks[0].time = 0;
                 int j = 0;
@@ -494,20 +498,20 @@ namespace timetable_app
         }
         public void OrderDisplay(Form1 form)
         {
-            foreach (Task t in tasks)
+            foreach (AppLogic.Task t in tasks)
             {
                 foreach (object s in form.TaskList.Items)
                 {
                     if (Convert.ToString(s) == t.taskDescription)
                     {
-                        Task previous = t;
+                        AppLogic.Task previous = t;
                         if (form.TaskList.Items.IndexOf(s) == 0)
                         {
                             t.display.Location = new Point(100, 100);
                         }
                         else
                         {
-                            foreach (Task u in tasks)
+                            foreach (AppLogic.Task u in tasks)
                             {
                                 if (u.taskDescription == Convert.ToString(form.TaskList.Items[form.TaskList.Items.IndexOf(s) - 1]))
                                 {
@@ -559,7 +563,7 @@ namespace timetable_app
                 Stream stream = new FileStream(@"ExampleNew.dat", FileMode.Open, FileAccess.Read);
                 if (stream.Length > 0)
                 {
-                    tasks = (List<Task>)formatter.Deserialize(stream);
+                    tasks = (List<AppLogic.Task>)formatter.Deserialize(stream);
                 }
 
                 stream.Close();
@@ -570,7 +574,7 @@ namespace timetable_app
 
 
         }
-        public void DeleteTasksFromFile(Task t)
+        public void DeleteTasksFromFile(AppLogic.Task t)
         {
             BinaryFormatter formatter = new BinaryFormatter();
             //Stream stream = new FileStream(@"ExampleNew.dat", FileMode.Create, FileAccess.ReadWrite);
@@ -594,19 +598,19 @@ namespace timetable_app
             }
         }
 
-           public void Clearing(List<Task> tasks, Form1 form, Calendar calendar)
+           public void Clearing(List<AppLogic.Task> tasks, Form1 form, Calendar calendar)
            {
-               foreach (Task t in tasks)
+               foreach (AppLogic.Task t in tasks)
                {
                    if (t.due.DayOfYear < DateTime.Now.DayOfYear)
                    {
                        form.Controls.Remove(t.display);
-                       completedTasks.Add(t);
+                    completedTasks.Add(t);
                        tasks.Remove(t);
                        form.TaskList.Items.Remove(t.taskDescription);
                        form.Controls.Remove(t.display);
-                       DeleteTasksFromFile(t);
-                       SaveTasksToFile();
+                    DeleteTasksFromFile(t);
+                    SaveTasksToFile();
                        if (tasks.Count != 0)
                        {
                            calendar.OrderTasks();
@@ -624,7 +628,7 @@ namespace timetable_app
            }
     }
 
-    public class BusyTime : Task
+    public class BusyTime : AppLogic.Task
     {
         public int startTime;
         public int endTime;
@@ -672,7 +676,7 @@ namespace timetable_app
         }
     }
 
-    public class Event : Task
+    public class Event : AppLogic.Task
     {
         public Event(string name, DateTime scheduled, bool completed, double time, double duration) : base(name, scheduled, duration, time, completed)
         {

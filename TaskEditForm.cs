@@ -7,14 +7,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using timetable_app.AppLogic;
 
 namespace timetable_app
 {
     public partial class TaskEditForm : Form
     {
         Form1 mainForm;
-        Task t;
-        public TaskEditForm(Form1 mainForm, Task t)
+        AppLogic.Task t;
+        public TaskEditForm(Form1 mainForm, AppLogic.Task t)
         {
             InitializeComponent();
             this.mainForm = mainForm;
@@ -29,7 +30,7 @@ namespace timetable_app
             textBox5.Text = Convert.ToString(t.priority);
             if (t.predecessors != null)
             {
-                foreach (Task u in mainForm.GetCalendar().GetTasks())
+                foreach (AppLogic.Task u in mainForm.GetCalendar().GetTasks())
                 {
                     checkedListBox1.Items.Add(u);
                     if (t.predecessors.Contains(u))
@@ -53,14 +54,14 @@ namespace timetable_app
             t.duration = Convert.ToInt32(textBox3.Text);
             t.priority = Convert.ToInt32(textBox5.Text);
             t.predecessors.Clear();
-            foreach (Task v in mainForm.GetCalendar().GetTasks())
+            foreach (AppLogic.Task v in mainForm.GetCalendar().GetTasks())
             {
                 if (v.successors.Contains(t))
                 {
                     v.successors.Remove(t);
                 }
             }
-            foreach (Task u in checkedListBox1.CheckedItems)
+            foreach (AppLogic.Task u in checkedListBox1.CheckedItems)
             {
                 t.predecessors.Add(u);
                 u.successors.Add(t);

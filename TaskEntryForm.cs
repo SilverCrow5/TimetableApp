@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
+using timetable_app.AppLogic;
 
 namespace timetable_app
 {
@@ -37,12 +38,12 @@ namespace timetable_app
             int priority = Convert.ToInt32(maskedTextBox3.Text);
             int time = 0;
 
-            Task task = new Task(taskName, description, DateTime.Now, false, time, duration, priority, dateDue);
+            AppLogic.Task task = new AppLogic.Task(taskName, description, DateTime.Now, false, time, duration, priority, dateDue);
 
             
             foreach (object o in priotiryTaskSelecter.CheckedItems)
             {
-                foreach (Task t in calendar.GetTasks())
+                foreach (AppLogic.Task t in calendar.GetTasks())
                 {
                     if (t.taskDescription == o.ToString())
                     {
@@ -84,7 +85,7 @@ namespace timetable_app
                 int duration = Convert.ToInt32(maskedTextBox2.Text);
                 int priority = Convert.ToInt32(maskedTextBox3.Text);
                 int time = 0;
-                Task task = new Task(taskName, description, DateTime.Now, false, time, duration, priority, dateDue);
+                AppLogic.Task task = new AppLogic.Task(taskName, description, DateTime.Now, false, time, duration, priority, dateDue);
                 sendingForm.tasks.Add(task);
                 calendar.OrderTasks();
                 calendar.UpdateTaskListControl(sendingForm);
@@ -99,7 +100,7 @@ namespace timetable_app
         public void UpdateTaskSelector()
         {
             priotiryTaskSelecter.Items.Clear();
-            foreach (Task t in calendar.GetTasks())
+            foreach (AppLogic.Task t in calendar.GetTasks())
             {
                 t.taskDescription = t.name + ", " + (t.time - (t.time % 1)) + ":" + (t.time % 1 * 60) + " - " + ((t.time + t.duration) - ((t.time + t.duration) % 1)) + ":" + ((t.time + t.duration) % 1 * 60) + ", " + t.scheduled.ToLongDateString();
                 if (t.due.DayOfYear >= dateTimePicker1.Value.DayOfYear)

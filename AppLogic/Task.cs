@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace timetable_app.Scripts
+namespace timetable_app.AppLogic
 {
     public class Task : ISerializable
     {
@@ -97,44 +97,56 @@ namespace timetable_app.Scripts
 
         public List<Task> Ahead(List<Task> list)
         {
-            list[0].EFT = list[0].EST + list[0].duration;
-            int i = 1;
-            while (i < list.Count)
+            if (list.Count != 0)
             {
-                foreach (Task t in list[i].predecessors)
+                list[0].EFT = list[0].EST + list[0].duration;
+                int i = 1;
+                while (i < list.Count)
                 {
-                    if (list[i].EST < t.EFT)
+                    if (list[i].predecessors.Count != 0)
                     {
-                        list[i].EST = t.EFT;
+                        foreach (Task t in list[i].predecessors)
+                        {
+                            if (list[i].EST < t.EFT)
+                            {
+                                list[i].EST = t.EFT;
+                            }
+                        }
+                        list[i].EFT = list[i].EST + list[i].duration;
+                        i++;
                     }
                 }
-                list[i].EFT = list[i].EST + list[i].duration;
-                i++;
             }
             return list;
         }
         public List<Task> Behind(List<Task> list)
         {
-            list[list.Count - 1].LFT = list[list.Count - 1].EFT;
-            list[list.Count - 1].LST = list[list.Count - 1].LFT - list[list.Count - 1].duration;
-            int i = list.Count - 2;
-            while (i >= 0)
+            if (list.Count != 0)
             {
-                foreach (Task t in list[i].successors)
+                list[list.Count - 1].LFT = list[list.Count - 1].EFT;
+                list[list.Count - 1].LST = list[list.Count - 1].LFT - list[list.Count - 1].duration;
+                int i = list.Count - 2;
+                while (i >= 0)
                 {
-                    if (list[i].LFT == 0)
+                    if (list[i].successors.Count != 0)
                     {
-                        list[i].LFT = t.LST;
-                    }
-                    else
-                    {
-                        if (list[i].LFT > t.LST)
+                        foreach (Task t in list[i].successors)
                         {
-                            list[i].LFT = t.LST;
+                            if (list[i].LFT == 0)
+                            {
+                                list[i].LFT = t.LST;
+                            }
+                            else
+                            {
+                                if (list[i].LFT > t.LST)
+                                {
+                                    list[i].LFT = t.LST;
+                                }
+                            }
                         }
+                        i--;
                     }
                 }
-                i--;
             }
             return list;
         }
@@ -143,15 +155,18 @@ namespace timetable_app.Scripts
         {
             Console.WriteLine("\n    Critical Path: ");
 
-            foreach (Task t in list)
+            if (list.Count != 0)
             {
-                if ((t.EFT - t.LFT == 0) && (t.EFT - t.LST == 0))
+                foreach (Task t in list)
                 {
-                    Console.WriteLine("{0}", t.name);
-                }
+                    if ((t.EFT - t.LFT == 0) && (t.EFT - t.LST == 0))
+                    {
+                        Console.WriteLine("{0}", t.name);
+                    }
 
+                }
+                Console.WriteLine("\n\n     Total duration: {0}\n\n", list[list.Count - 1].EFT);
             }
-            Console.WriteLine("\n\n     Total duration: {0}\n\n", list[list.Count - 1].EFT);
         }
 
     }
