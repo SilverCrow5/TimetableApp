@@ -25,9 +25,9 @@ namespace timetable_app
             dateTimePicker1.Value = t.scheduled;
             dateTimePicker2.Value = t.due;
             textBox2.Text = t.details;
-            textBox3.Text = Convert.ToString(t.duration);
-            textBox4.Text = Convert.ToString(t.time - (t.time % 1)) + ":" + Convert.ToString(t.time % 1 * 60);
-            textBox5.Text = Convert.ToString(t.priority);
+            maskedTextBox1.Text = Convert.ToString(t.duration);
+            maskedTextBox2.Text = Convert.ToString(t.time - (t.time % 1)) + ":" + Convert.ToString(t.time % 1 * 60);
+            maskedTextBox3.Text = Convert.ToString(t.priority);
             if (t.predecessors != null)
             {
                 foreach (AppLogic.Task u in mainForm.GetCalendar().GetTasks())
@@ -51,8 +51,8 @@ namespace timetable_app
             t.name = textBox1.Text;
             t.due = dateTimePicker2.Value;
             t.details = textBox2.Text;
-            t.duration = Convert.ToInt32(textBox3.Text);
-            t.priority = Convert.ToInt32(textBox5.Text);
+            t.duration = Convert.ToInt32(maskedTextBox1.Text);
+            t.priority = Convert.ToInt32(maskedTextBox3.Text);
             t.predecessors.Clear();
             foreach (AppLogic.Task v in mainForm.GetCalendar().GetTasks())
             {
@@ -73,6 +73,11 @@ namespace timetable_app
         {
             
             Close();
+
+        }
+
+        private void textBox3_TextChanged(object sender, EventArgs e)
+        {
 
         }
     }

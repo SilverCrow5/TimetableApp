@@ -20,17 +20,17 @@ namespace timetable_app
             this.calendar = calendar;
             this.sendingForm = sendingForm;
 
-            if(maskedTextBox1.Text != "" && maskedTextBox2.Text != "")
+            if(textBox1.Text != "" && textBox2.Text != "")
             {
-                maskedTextBox3.Text = Convert.ToString(Convert.ToInt32(maskedTextBox1.Text) + Convert.ToInt32(maskedTextBox2.Text));
+                textBox3.Text = Convert.ToString(Convert.ToInt32(textBox1.Text) + Convert.ToInt32(textBox2.Text));
             }
-            if(maskedTextBox1.Text != "" && maskedTextBox3.Text != "" && maskedTextBox2.Text == "")
+            if(textBox1.Text != "" && textBox3.Text != "" && textBox2.Text == "")
             {
-                maskedTextBox2.Text = Convert.ToString(Convert.ToInt32(maskedTextBox3.Text) - Convert.ToInt32(maskedTextBox1.Text));
+                textBox2.Text = Convert.ToString(Convert.ToInt32(textBox3.Text) - Convert.ToInt32(textBox1.Text));
             }
-            if(maskedTextBox2.Text != "" && maskedTextBox3.Text != "" && maskedTextBox1.Text == "")
+            if(textBox2.Text != "" && textBox3.Text != "" && textBox1.Text == "")
             {
-                maskedTextBox1.Text = Convert.ToString(Convert.ToInt32(maskedTextBox3.Text) - Convert.ToInt32(maskedTextBox2.Text));
+                textBox1.Text = Convert.ToString(Convert.ToInt32(textBox3.Text) - Convert.ToInt32(textBox2.Text));
             }
         }
 
@@ -54,15 +54,15 @@ namespace timetable_app
             {
                 reason = textBox1.Text;
             }
-            double time = Convert.ToDouble(maskedTextBox1.Text);
-            double duration = Convert.ToDouble(maskedTextBox2.Text);
-            if(maskedTextBox2.Text == null)
+            double time = Convert.ToDouble(textBox1.Text);
+            double duration = Convert.ToDouble(textBox2.Text);
+            if(textBox2.Text == null)
             {
-                duration = Convert.ToDouble(maskedTextBox3.Text) - time;
+                duration = Convert.ToDouble(textBox3.Text) - time;
             }
             BusyTime one = new BusyTime(reason, DateTime.Now, false, time, duration, repeat);
 
-            if (maskedTextBox3.Text == "")
+            if (textBox3.Text == null)
             {
                 one.endTime = one.startTime + Convert.ToInt32(one.duration);
             }
@@ -74,7 +74,7 @@ namespace timetable_app
                 }
                 one.repeatEndDate = dateTimePicker1.Value;
             }
-            one.endTime = Convert.ToInt32(maskedTextBox3.Text);
+            one.endTime = Convert.ToInt32(textBox3.Text);
 
 
             //Calendar calendar = sendingForm.GetCalendar();
@@ -116,44 +116,41 @@ namespace timetable_app
             
         }
 
-        private void maskedTextBox1_MaskInputRejected(object sender, MaskInputRejectedEventArgs e)
-        {
 
-        }
 
-        private void maskedTextBox1_TextChanged(object sender, EventArgs e)
+        private void textBox1_TextChanged_1(object sender, EventArgs e)
         {
-            if(maskedTextBox1.Text != "" && maskedTextBox2.Text != "")
+            if (textBox1.Text != "" && textBox2.Text != "")
             {
-                maskedTextBox3.Text = Convert.ToString(Convert.ToInt32(maskedTextBox1.Text) + Convert.ToInt32(maskedTextBox2.Text));
+                textBox3.Text = Convert.ToString(Convert.ToInt32(textBox1.Text) + Convert.ToInt32(textBox2.Text));
             }
-            if(maskedTextBox1.Text != "" && maskedTextBox2.Text == "" && maskedTextBox3.Text != "")
+            if (textBox1.Text != "" && textBox2.Text == "" && textBox3.Text != "")
             {
-                maskedTextBox2.Text = Convert.ToString(Convert.ToInt32(maskedTextBox3.Text) - Convert.ToInt32(maskedTextBox1.Text));
+                textBox2.Text = Convert.ToString(Convert.ToInt32(textBox3.Text) - Convert.ToInt32(textBox1.Text));
             }
         }
 
-        private void maskedTextBox2_TextChanged(object sender, EventArgs e)
+        private void textBox2_TextChanged_1(object sender, EventArgs e)
         {
-            if(maskedTextBox2.Text != "" && maskedTextBox1.Text != "")
+            if (textBox2.Text != "" && textBox1.Text != "")
             {
-                maskedTextBox3.Text = Convert.ToString(Convert.ToInt32(maskedTextBox1.Text) + Convert.ToInt32(maskedTextBox2.Text));
+                textBox3.Text = Convert.ToString(Convert.ToInt32(textBox1.Text) + Convert.ToInt32(textBox2.Text));
             }
-            if(maskedTextBox3.Text != "" && maskedTextBox1.Text == "" && maskedTextBox1.Text != "")
+            if (textBox3.Text != "" && textBox1.Text == "" && textBox1.Text != "")
             {
-                maskedTextBox1.Text = Convert.ToString(Convert.ToInt32(maskedTextBox3.Text) - Convert.ToInt32(maskedTextBox2.Text));
+                textBox1.Text = Convert.ToString(Convert.ToInt32(textBox3.Text) - Convert.ToInt32(textBox2.Text));
             }
         }
 
-        private void maskedTextBox3_TextChanged(object sender, EventArgs e)
+        private void textBox3_TextChanged(object sender, EventArgs e)
         {
-            if(maskedTextBox3.Text != "" && maskedTextBox1.Text != "")
+            if (textBox3.Text != "" && textBox1.Text != "")
             {
-                maskedTextBox2.Text = Convert.ToString(Convert.ToInt32(maskedTextBox3.Text) - Convert.ToInt32(maskedTextBox1.Text));
+                textBox2.Text = Convert.ToString(Convert.ToInt32(textBox3.Text) - Convert.ToInt32(textBox1.Text));
             }
-            if(maskedTextBox2.Text != "" && maskedTextBox1.Text == "" && maskedTextBox3.Text != "")
+            if (textBox2.Text != "" && textBox1.Text == "" && textBox3.Text != "")
             {
-                maskedTextBox1.Text = Convert.ToString(Convert.ToInt32(maskedTextBox3.Text) - Convert.ToInt32(maskedTextBox2.Text));
+                textBox1.Text = Convert.ToString(Convert.ToInt32(textBox3.Text) - Convert.ToInt32(textBox2.Text));
             }
         }
     }

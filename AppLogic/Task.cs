@@ -9,6 +9,7 @@ using System.Windows.Forms;
 
 namespace timetable_app.AppLogic
 {
+    [Serializable]
     public class Task : ISerializable
     {
         public string name;
@@ -106,7 +107,7 @@ namespace timetable_app.AppLogic
                 int i = 1;
                 while (i < list.Count)
                 {
-                    if (list[i].predecessors.Count != 0)
+                    if (list[i].predecessors != null && list[i].predecessors.Count != 0)
                     {
                         foreach (Task t in list[i].predecessors)
                         {
@@ -116,8 +117,8 @@ namespace timetable_app.AppLogic
                             }
                         }
                         list[i].estimatedFinishTime = list[i].estimatedStartTime + list[i].duration;
-                        i++;
                     }
+                    i++;
                 }
             }
             return list;
@@ -131,7 +132,7 @@ namespace timetable_app.AppLogic
                 int i = list.Count - 2;
                 while (i >= 0)
                 {
-                    if (list[i].successors.Count != 0)
+                    if (list[i].successors != null && list[i].successors.Count != 0)
                     {
                         foreach (Task t in list[i].successors)
                         {
@@ -147,8 +148,8 @@ namespace timetable_app.AppLogic
                                 }
                             }
                         }
-                        i--;
                     }
+                    i--;
                 }
             }
             return list;
