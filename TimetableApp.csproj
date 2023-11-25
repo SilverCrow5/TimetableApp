@@ -96,7 +96,6 @@
     <EmbeddedResource Include="TaskEntryForm.resx">
       <DependentUpon>TaskEntryForm.cs</DependentUpon>
     </EmbeddedResource>
-    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -109,15 +108,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Scripts\jquery-1.7-vsdoc.js" />
-    <Content Include="Scripts\jquery-1.7.js" />
-    <Content Include="Scripts\jquery-1.7.min.js" />
-    <Content Include="Scripts\jquery.event.drag.js" />
-    <Content Include="Scripts\jquery.event.drag.live.js" />
-    <Content Include="Scripts\jquery.event.drag.live.min.js" />
-    <Content Include="Scripts\jquery.event.drag.min.js" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
