@@ -24,6 +24,14 @@ namespace timetable_app
             {
                 maskedTextBox3.Text = Convert.ToString(Convert.ToInt32(maskedTextBox1.Text) + Convert.ToInt32(maskedTextBox2.Text));
             }
+            if(maskedTextBox1.Text != "" && maskedTextBox3.Text != "" && maskedTextBox2.Text == "")
+            {
+                maskedTextBox2.Text = Convert.ToString(Convert.ToInt32(maskedTextBox3.Text) - Convert.ToInt32(maskedTextBox1.Text));
+            }
+            if(maskedTextBox2.Text != "" && maskedTextBox3.Text != "" && maskedTextBox1.Text == "")
+            {
+                maskedTextBox1.Text = Convert.ToString(Convert.ToInt32(maskedTextBox3.Text) - Convert.ToInt32(maskedTextBox2.Text));
+            }
         }
 
         private void busyTimeForm_Load(object sender, EventArgs e)
@@ -72,6 +80,7 @@ namespace timetable_app
             //Calendar calendar = sendingForm.GetCalendar();
             calendar.GetTasks().Add(one);
             calendar.GetBusyTime().Add(one);
+            
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
@@ -126,7 +135,7 @@ namespace timetable_app
 
         private void maskedTextBox2_TextChanged(object sender, EventArgs e)
         {
-            if (maskedTextBox2.Text != "" && maskedTextBox1.Text != "")
+            if(maskedTextBox2.Text != "" && maskedTextBox1.Text != "")
             {
                 maskedTextBox3.Text = Convert.ToString(Convert.ToInt32(maskedTextBox1.Text) + Convert.ToInt32(maskedTextBox2.Text));
             }
