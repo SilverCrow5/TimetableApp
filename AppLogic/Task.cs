@@ -16,7 +16,7 @@ namespace timetable_app.AppLogic
         public DateTime scheduled;
         public bool completed;
         [NonSerialized]
-        public Label display; //this doesent' work with the saving feature so I comment out everything refrencing while I eneable the saving feature it until I can make them work together
+        public Label display;
         public double duration;
         public string taskDescription;
         public int priority;
@@ -25,10 +25,11 @@ namespace timetable_app.AppLogic
         public List<Task> predecessors;
         public List<Task> successors;
         public string details;
-        public double EST;
-        public double LST;
-        public double EFT;
-        public double LFT;
+        public double estimatedStartTime;
+        public double latestStartTime;
+        public double estimatedFinishTime;
+        public double latestFinishTime;
+        //public Guid ID;
         public Task(string name, string details, DateTime scheduled, bool completed, double time, double duration, int priority, DateTime due)
         {
 
@@ -52,6 +53,8 @@ namespace timetable_app.AppLogic
             this.predecessors = new List<Task>();
             this.successors = new List<Task>();
             this.details = details;
+
+            //this.ID = new Guid();
         }
         public Task(string name, DateTime scheduled, double duration, Double time, bool completed)
         {
@@ -99,7 +102,7 @@ namespace timetable_app.AppLogic
         {
             if (list.Count != 0)
             {
-                list[0].EFT = list[0].EST + list[0].duration;
+                list[0].estimatedFinishTime = list[0].estimatedStartTime + list[0].duration;
                 int i = 1;
                 while (i < list.Count)
                 {
@@ -107,12 +110,12 @@ namespace timetable_app.AppLogic
                     {
                         foreach (Task t in list[i].predecessors)
                         {
-                            if (list[i].EST < t.EFT)
+                            if (list[i].estimatedStartTime < t.estimatedFinishTime)
                             {
-                                list[i].EST = t.EFT;
+                                list[i].estimatedStartTime = t.estimatedFinishTime;
                             }
                         }
-                        list[i].EFT = list[i].EST + list[i].duration;
+                        list[i].estimatedFinishTime = list[i].estimatedStartTime + list[i].duration;
                         i++;
                     }
                 }
@@ -123,8 +126,8 @@ namespace timetable_app.AppLogic
         {
             if (list.Count != 0)
             {
-                list[list.Count - 1].LFT = list[list.Count - 1].EFT;
-                list[list.Count - 1].LST = list[list.Count - 1].LFT - list[list.Count - 1].duration;
+                list[list.Count - 1].latestFinishTime = list[list.Count - 1].estimatedFinishTime;
+                list[list.Count - 1].latestStartTime = list[list.Count - 1].latestFinishTime - list[list.Count - 1].duration;
                 int i = list.Count - 2;
                 while (i >= 0)
                 {
@@ -132,15 +135,15 @@ namespace timetable_app.AppLogic
                     {
                         foreach (Task t in list[i].successors)
                         {
-                            if (list[i].LFT == 0)
+                            if (list[i].latestFinishTime == 0)
                             {
-                                list[i].LFT = t.LST;
+                                list[i].latestFinishTime = t.latestStartTime;
                             }
                             else
                             {
-                                if (list[i].LFT > t.LST)
+                                if (list[i].latestFinishTime > t.latestStartTime)
                                 {
-                                    list[i].LFT = t.LST;
+                                    list[i].latestFinishTime = t.latestStartTime;
                                 }
                             }
                         }
@@ -159,13 +162,13 @@ namespace timetable_app.AppLogic
             {
                 foreach (Task t in list)
                 {
-                    if ((t.EFT - t.LFT == 0) && (t.EFT - t.LST == 0))
+                    if ((t.estimatedFinishTime - t.latestFinishTime == 0) && (t.estimatedFinishTime - t.latestStartTime == 0))
                     {
                         Console.WriteLine("{0}", t.name);
                     }
 
                 }
-                Console.WriteLine("\n\n     Total duration: {0}\n\n", list[list.Count - 1].EFT);
+                Console.WriteLine("\n\n     Total duration: {0}\n\n", list[list.Count - 1].estimatedFinishTime);
             }
         }
 
