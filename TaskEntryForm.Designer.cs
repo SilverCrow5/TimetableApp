@@ -29,6 +29,8 @@
         private void InitializeComponent()
         {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.priorityTaskSelecter = new System.Windows.Forms.CheckedListBox();
             this.button2 = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.label7 = new System.Windows.Forms.Label();
@@ -41,15 +43,13 @@
             this.label2 = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.priotiryTaskSelecter = new System.Windows.Forms.CheckedListBox();
-            this.label5 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.label5);
-            this.groupBox1.Controls.Add(this.priotiryTaskSelecter);
+            this.groupBox1.Controls.Add(this.priorityTaskSelecter);
             this.groupBox1.Controls.Add(this.button2);
             this.groupBox1.Controls.Add(this.button1);
             this.groupBox1.Controls.Add(this.label7);
@@ -69,6 +69,24 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Task Details";
             this.groupBox1.Enter += new System.EventHandler(this.groupBox1_Enter);
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(277, 253);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(155, 13);
+            this.label5.TabIndex = 18;
+            this.label5.Text = "Tasks with priority over this one";
+            // 
+            // priorityTaskSelecter
+            // 
+            this.priorityTaskSelecter.FormattingEnabled = true;
+            this.priorityTaskSelecter.Location = new System.Drawing.Point(280, 279);
+            this.priorityTaskSelecter.Name = "priorityTaskSelecter";
+            this.priorityTaskSelecter.Size = new System.Drawing.Size(120, 94);
+            this.priorityTaskSelecter.TabIndex = 17;
+            this.priorityTaskSelecter.SelectedIndexChanged += new System.EventHandler(this.checkedListBox1_SelectedIndexChanged);
             // 
             // button2
             // 
@@ -171,24 +189,6 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "Task name";
             // 
-            // priotiryTaskSelecter
-            // 
-            this.priotiryTaskSelecter.FormattingEnabled = true;
-            this.priotiryTaskSelecter.Location = new System.Drawing.Point(280, 279);
-            this.priotiryTaskSelecter.Name = "priotiryTaskSelecter";
-            this.priotiryTaskSelecter.Size = new System.Drawing.Size(120, 94);
-            this.priotiryTaskSelecter.TabIndex = 17;
-            this.priotiryTaskSelecter.SelectedIndexChanged += new System.EventHandler(this.checkedListBox1_SelectedIndexChanged);
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(277, 253);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(155, 13);
-            this.label5.TabIndex = 18;
-            this.label5.Text = "Tasks with priority over this one";
-            // 
             // TaskEntryForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -219,7 +219,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.CheckedListBox priotiryTaskSelecter;
+        private System.Windows.Forms.CheckedListBox priorityTaskSelecter;
         private System.Windows.Forms.Label label5;
     }
 }

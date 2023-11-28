@@ -41,7 +41,7 @@ namespace timetable_app
             AppLogic.Task task = new AppLogic.Task(taskName, description, DateTime.Now, false, time, duration, priority, dateDue);
 
             
-            foreach (object o in priotiryTaskSelecter.CheckedItems)
+            foreach (object o in priorityTaskSelecter.CheckedItems)
             {
                 foreach (AppLogic.Task t in calendar.GetTasks())
                 {
@@ -49,7 +49,8 @@ namespace timetable_app
                     {
                         task.predecessors.Add(t);
                         t.successors.Add(task);
-                        
+                        task.predecessors2.Add(t.ID);
+                        t.successors2.Add(task.ID);
                     }
 
                 }
@@ -99,13 +100,13 @@ namespace timetable_app
 
         public void UpdateTaskSelector()
         {
-            priotiryTaskSelecter.Items.Clear();
+            priorityTaskSelecter.Items.Clear();
             foreach (AppLogic.Task t in calendar.GetTasks())
             {
                 t.taskDescription = t.name + ", " + (t.time - (t.time % 1)) + ":" + (t.time % 1 * 60) + " - " + ((t.time + t.duration) - ((t.time + t.duration) % 1)) + ":" + ((t.time + t.duration) % 1 * 60) + ", " + t.scheduled.ToLongDateString();
                 if (t.due.DayOfYear >= dateTimePicker1.Value.DayOfYear)
                 {
-                    priotiryTaskSelecter.Items.Add(t.taskDescription);
+                    priorityTaskSelecter.Items.Add(t.taskDescription);
 
                 }
             }
