@@ -211,6 +211,26 @@ namespace timetable_app
             var frm = new busyTimeForm(this, calendar);
             frm.ShowDialog();
         }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            if(checkBox1.Checked == true)
+            {
+                foreach(AppLogic.Task t in calendar.GetTasks())
+                {
+                    if(t.scheduled == dateTimePicker1.Value && t.GetType() == typeof(BusyTime))
+                    {
+                        t.display.Visible = true;
+                    }
+                }
+            }
+        }
+
+        private void btnWeekView_Click(object sender, EventArgs e)
+        {
+            var frm = new WeekViewForm(this, calendar);
+            frm.ShowDialog();
+        }
     }
     /*
     [Serializable]

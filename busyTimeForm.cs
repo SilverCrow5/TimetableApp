@@ -136,7 +136,7 @@ namespace timetable_app
             {
                 textBox3.Text = Convert.ToString(Convert.ToInt32(textBox1.Text) + Convert.ToInt32(textBox2.Text));
             }
-            if (textBox3.Text != "" && textBox1.Text == "" && textBox1.Text != "")
+            if (textBox3.Text != "" && textBox1.Text == "" && textBox2.Text != "")
             {
                 textBox1.Text = Convert.ToString(Convert.ToInt32(textBox3.Text) - Convert.ToInt32(textBox2.Text));
             }

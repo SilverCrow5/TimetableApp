@@ -74,6 +74,12 @@
     <Compile Include="TaskEntryForm.Designer.cs">
       <DependentUpon>TaskEntryForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="WeekViewForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="WeekViewForm.Designer.cs">
+      <DependentUpon>WeekViewForm.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="busyTimeForm.resx">
       <DependentUpon>busyTimeForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -95,6 +101,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="TaskEntryForm.resx">
       <DependentUpon>TaskEntryForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WeekViewForm.resx">
+      <DependentUpon>WeekViewForm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

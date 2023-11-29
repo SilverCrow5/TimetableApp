@@ -77,8 +77,10 @@ namespace timetable_app.AppLogic
             duration = information.GetDouble("Duration");
             priority = information.GetInt16("Priority");
             due = information.GetDateTime("Due");
-            predecessors = new List<Task>;
-            successors = new List<Task>;
+            predecessors = new List<Task>();
+            successors = new List<Task>();
+            predecessors2 = new List<Guid>();
+            successors2 = new List<Guid>();
 
             display = new Label();
             display.Text = name;
@@ -103,6 +105,8 @@ namespace timetable_app.AppLogic
             information.AddValue("Due", due);
             information.AddValue("Successors", successors);
             information.AddValue("Predecessors", predecessors);
+            information.AddValue("Successors2", successors2);
+            information.AddValue("Predecessors2", predecessors2);
 
 
         }
