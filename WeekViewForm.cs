@@ -34,29 +34,29 @@ namespace timetable_app
                 l.BorderStyle = BorderStyle.FixedSingle;
                 l.Width = width;
                 l.Height = Convert.ToInt32(t.duration) * height;
-                int locY = 100 + (Convert.ToInt32(t.time) - 9) * 100; //- 9 to account for array starting at 9am, 100+ because that's the location of the first box on y axis
+                int locY = 100 + ((Convert.ToInt32(t.time) - 9) * 50); //- 9 to account for array starting at 9am, 100+ because that's the location of the first box on y axis
                 switch (t.scheduled.DayOfWeek)
                 {
                     case DayOfWeek.Monday:
-                        l.Location = new Point(100 + 1 * width, locY);
+                        l.Location = new Point(1 * width, locY);
                         break;
                     case DayOfWeek.Tuesday:
-                        l.Location = new Point(100 + 2 * width, locY);
+                        l.Location = new Point(2 * width, locY);
                         break;
                     case DayOfWeek.Wednesday:
-                        l.Location = new Point(100 + 3 * width, locY);
+                        l.Location = new Point(3 * width, locY);
                         break;
                     case DayOfWeek.Thursday:
-                        l.Location = new Point(100 + 4 * width, locY);
+                        l.Location = new Point(4 * width, locY);
                         break;
                     case DayOfWeek.Friday:
-                        l.Location = new Point(100 + 5 * width, locY);
+                        l.Location = new Point(5 * width, locY);
                         break;
                     case DayOfWeek.Saturday:
-                        l.Location = new Point(100 + 6 * width, locY);
+                        l.Location = new Point(6 * width, locY);
                         break;
                     case DayOfWeek.Sunday:
-                        l.Location = new Point(100 + 7 * width, locY);
+                        l.Location = new Point(7 * width, locY);
                         break;
 
                 }
@@ -65,6 +65,10 @@ namespace timetable_app
                 l.BringToFront();
                 labelTasks.Add(l);
                 this.Controls.Add(l);
+                if(t.time < 9 || t.time > 21)
+                {
+                    l.Hide();
+                }
             }
 
 
