@@ -42,6 +42,7 @@ namespace timetable_app
             graphics = this.CreateGraphics();
             pen = new Pen(Brushes.Black);
             tasks = new List<AppLogic.Task>();
+            busyTimes = new List<BusyTime>();
             completedTasks = new List<AppLogic.Task>();
             calendar = new Calendar();
             textBox1.Text = Convert.ToString(now.DayOfWeek);
@@ -216,12 +217,16 @@ namespace timetable_app
         {
             if(checkBox1.Checked == true)
             {
-                foreach(AppLogic.Task t in calendar.GetTasks())
+                foreach(AppLogic.Task t in tasks)
                 {
                     if(t.scheduled == dateTimePicker1.Value && t.GetType() == typeof(BusyTime))
                     {
                         t.display.Visible = true;
                     }
+                }
+                foreach(BusyTime u in busyTimes)
+                {
+                    u.display.Visible = true;
                 }
             }
         }
@@ -435,7 +440,7 @@ namespace timetable_app
             {
                 AppLogic.Task lastAdded = tasks[tasks.Count - 1];
                 tasks = tasks.OrderByDescending(x => x.priority).ThenByDescending(x => x.estimatedStartTime).ThenByDescending(x => x.duration).ToList();
-                tasks[0].time = 0;
+                tasks[0].time = 9;
                 int j = 0;
 
                 while (j < tasks.Count)
@@ -443,7 +448,7 @@ namespace timetable_app
                     if (tasks[j].GetType() != typeof(BusyTime))
                     {
                         tasks[j].scheduled = DateTime.Today;
-                        tasks[j].time = 0;
+                        tasks[j].time = 9;
                         tasks[j].Ahead(tasks);
                         tasks[j].Behind(tasks);
                         int k = 0;

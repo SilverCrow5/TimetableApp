@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using timetable_app.AppLogic;
 
 namespace timetable_app
 {
@@ -66,6 +67,7 @@ namespace timetable_app
             {
                 one.endTime = one.startTime + Convert.ToInt32(one.duration);
             }
+            one.endTime = Convert.ToInt32(textBox3.Text);
             if(checkBox1.Checked == true)
             {
                 foreach(string s in checkedListBox1.CheckedItems)
@@ -78,8 +80,9 @@ namespace timetable_app
 
 
             //Calendar calendar = sendingForm.GetCalendar();
-            calendar.GetTasks().Add(one);
-            calendar.GetBusyTime().Add(one);
+            sendingForm.tasks.Add(one);
+            sendingForm.busyTimes.Add(one);
+            Close();
             
         }
 
