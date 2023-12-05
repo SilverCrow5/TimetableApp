@@ -221,11 +221,13 @@ namespace timetable_app
                 {
                     if(t.scheduled == dateTimePicker1.Value && t.GetType() == typeof(BusyTime))
                     {
+                        this.Controls.Add(t.display);
                         t.display.Visible = true;
                     }
                 }
                 foreach(BusyTime u in busyTimes)
                 {
+                    this.Controls.Add(u.display);
                     u.display.Visible = true;
                 }
             }
@@ -440,7 +442,7 @@ namespace timetable_app
             {
                 AppLogic.Task lastAdded = tasks[tasks.Count - 1];
                 tasks = tasks.OrderByDescending(x => x.priority).ThenByDescending(x => x.estimatedStartTime).ThenByDescending(x => x.duration).ToList();
-                tasks[0].time = 9;
+                tasks[0].time = 0;
                 int j = 0;
 
                 while (j < tasks.Count)
@@ -448,7 +450,7 @@ namespace timetable_app
                     if (tasks[j].GetType() != typeof(BusyTime))
                     {
                         tasks[j].scheduled = DateTime.Today;
-                        tasks[j].time = 9;
+                        tasks[j].time = 0;
                         tasks[j].Ahead(tasks);
                         tasks[j].Behind(tasks);
                         int k = 0;
@@ -480,6 +482,7 @@ namespace timetable_app
                             {
                                 MessageBox.Show("There is not enough time to schedule them all");
                                 tasks.Remove(lastAdded);
+                                j--;
                             }
                             //OrderTasks(); makes it all go wrong
                         }
