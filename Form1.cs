@@ -634,6 +634,7 @@ namespace timetable_app
         public bool availabeCheck(AppLogic.Task t)
         {
             bool available = true;
+            int number = 0;
             foreach (BusyTime a in busyTimes)
             {
                 if(t.scheduled.Date == a.scheduled.Date)
@@ -641,18 +642,22 @@ namespace timetable_app
                     if(t.time >= a.startTime && t.time <= a.endTime)
                     {
                         available = false;
+                        number = a.endTime;
                     }
                     if(t.end >= a.startTime && t.end <= a.endTime)
                     {
                         available = false;
+                        number = a.endTime;
                     }
                     if(a.startTime >= t.time && a.startTime <= t.end)
                     {
                         available = false;
+                        number = a.endTime;
                     }
                     if(a.endTime >= t.time && a.endTime <= t.end)
                     {
                         available = false;
+                        number = a.endTime;
                     }
                 }
             }
