@@ -147,7 +147,7 @@ namespace timetable_app
                 }
                 if (e.KeyData == Keys.E)
                 {
-                    var frm = new TaskEditForm(this, current);
+                    var frm = new TaskEditForm(this, current, calendar);
                     frm.ShowDialog();
 
 
@@ -453,30 +453,14 @@ namespace timetable_app
                         tasks[j].time = 0;
                         tasks[j].Ahead(tasks);
                         tasks[j].Behind(tasks);
-                        int k = 0;
-                        while (k < j)
-                        {
-                            if (tasks[j].scheduled.DayOfYear == tasks[k].scheduled.DayOfYear)
-                            {
-                                tasks[j].time = tasks[k].time + tasks[k].duration;
-                            }
-                            k++;
-                        }
+                        orderForDay(tasks[j], tasks);
                         if (tasks[j].time + tasks[j].duration > 24)
                         {
                             if (tasks[j].scheduled.AddDays(1).DayOfYear <= tasks[j].due.DayOfYear)
                             {
                                 tasks[j].scheduled = tasks[j].scheduled.AddDays(1);
                                 tasks[j].time = 0;
-                                int l = 0;
-                                while (l < j)
-                                {
-                                    if (tasks[j].scheduled.DayOfYear == tasks[l].scheduled.DayOfYear)
-                                    {
-                                        tasks[j].time = tasks[l].time + tasks[l].duration;
-                                    }
-                                    l++;
-                                }
+                                orderForDay(tasks[j], tasks);
                             }
                             else
                             {
@@ -487,14 +471,7 @@ namespace timetable_app
                             //OrderTasks(); makes it all go wrong
                         }
                         int i = 0;
-                        while (i < j)
-                        {
-                            if (tasks[j].scheduled.DayOfYear == tasks[i].scheduled.DayOfYear)
-                            {
-                                tasks[j].time = tasks[i].time + tasks[i].duration;
-                            }
-                            i++;
-                        }
+                        orderForDay(tasks[j], tasks);
                         if (j < tasks.Count && tasks.Count != 0)
                         {
                             tasks[j].taskDescription = tasks[j].name + ", " + (tasks[j].time - (tasks[j].time % 1)) + ":" + (tasks[j].time % 1 * 60) + " - " + ((tasks[j].time + tasks[j].duration) - (tasks[j].time + tasks[j].duration % 1)) + ":" + ((tasks[j].time + tasks[j].duration) % 1 * 60) + ", " + tasks[j].scheduled.ToLongDateString();
@@ -552,14 +529,14 @@ namespace timetable_app
                                 t.display.Location = new Point(100, Convert.ToInt32(previous.display.Location.Y + 100));
                             }
                         }
-                        if (t.display.Created == true)
-                        {
-                            form.Controls.Remove(t.display);
-                            if (form.dateTimePicker1.Value.Date == t.scheduled.Date)
-                            {
-                                form.Controls.Add(t.display);
-                            }
-                        }
+                    }
+                }
+                if (t.display.Created == true)
+                {
+                    t.display.Visible = false;
+                    if (form.dateTimePicker1.Value.Date == t.scheduled.Date)
+                    {
+                        t.display.Visible = true;
                     }
                 }
             }
@@ -626,34 +603,74 @@ namespace timetable_app
             }
         }
 
-           public void Clearing(List<AppLogic.Task> tasks, Form1 form, Calendar calendar)
-           {
-               foreach (AppLogic.Task t in tasks)
-               {
-                   if (t.due.DayOfYear < DateTime.Now.DayOfYear)
-                   {
-                       form.Controls.Remove(t.display);
+        public void Clearing(List<AppLogic.Task> tasks, Form1 form, Calendar calendar)
+        {
+            foreach (AppLogic.Task t in tasks)
+            {
+                if (t.due.DayOfYear < DateTime.Now.DayOfYear)
+                {
+                    form.Controls.Remove(t.display);
                     completedTasks.Add(t);
-                       tasks.Remove(t);
-                       form.TaskList.Items.Remove(t.taskDescription);
-                       form.Controls.Remove(t.display);
+                    tasks.Remove(t);
+                    form.TaskList.Items.Remove(t.taskDescription);
+                    form.Controls.Remove(t.display);
                     DeleteTasksFromFile(t);
                     SaveTasksToFile();
-                       if (tasks.Count != 0)
-                       {
-                           calendar.OrderTasks();
-                           calendar.UpdateTaskListControl(form);
-                           calendar.OrderDisplay(form);
-                       }
-                   }
-                   if (t.scheduled.DayOfYear < DateTime.Now.DayOfYear)
-                   {
-                       calendar.OrderTasks();
-                       calendar.UpdateTaskListControl(form);
-                       calendar.OrderDisplay(form);
-                   }
-               }
-           }
+                    if (tasks.Count != 0)
+                    {
+                        calendar.OrderTasks();
+                        calendar.UpdateTaskListControl(form);
+                        calendar.OrderDisplay(form);
+                    }
+                }
+                if (t.scheduled.DayOfYear < DateTime.Now.DayOfYear)
+                {
+                    calendar.OrderTasks();
+                    calendar.UpdateTaskListControl(form);
+                    calendar.OrderDisplay(form);
+                }
+            }
+        }
+        public bool availabeCheck(AppLogic.Task t)
+        {
+            bool available = true;
+            foreach (BusyTime a in busyTimes)
+            {
+                if(t.scheduled.Date == a.scheduled.Date)
+                {
+                    if(t.time >= a.startTime && t.time <= a.endTime)
+                    {
+                        available = false;
+                    }
+                    if(t.end >= a.startTime && t.end <= a.endTime)
+                    {
+                        available = false;
+                    }
+                    if(a.startTime >= t.time && a.startTime <= t.end)
+                    {
+                        available = false;
+                    }
+                    if(a.endTime >= t.time && a.endTime <= t.end)
+                    {
+                        available = false;
+                    }
+                }
+            }
+            return available;
+        }
+        public void orderForDay(AppLogic.Task t, List<AppLogic.Task> list)
+        {
+            int i = 0;
+            int j = list.IndexOf(t);
+            while (i < j)
+            {
+                if (t.scheduled.DayOfYear == tasks[i].scheduled.DayOfYear)
+                {
+                    t.time = tasks[i].time + tasks[i].duration;
+                }
+                i++;
+            }
+        }
     }
 
     public class BusyTime : AppLogic.Task
@@ -680,7 +697,7 @@ namespace timetable_app
 
             display = new Label();
             display.Text = "example";
-            display.Width = 100 + 10 * Convert.ToInt32(duration); //change this based on length of task
+            display.Width = 100 + 10 * Convert.ToInt32(duration); //change this based on duration
             display.Height = 100;
 
             display.Location = new Point(100, 100);

@@ -14,11 +14,13 @@ namespace timetable_app
     public partial class TaskEditForm : Form
     {
         Form1 mainForm;
+        Calendar calendar;
         AppLogic.Task t;
-        public TaskEditForm(Form1 mainForm, AppLogic.Task t)
+        public TaskEditForm(Form1 mainForm, AppLogic.Task t, Calendar calendar)
         {
             InitializeComponent();
             this.mainForm = mainForm;
+            this.calendar = calendar;
             this.t = t;
 
             textBox1.Text = t.name;
@@ -51,7 +53,7 @@ namespace timetable_app
             t.name = textBox1.Text;
             t.due = dateTimePicker2.Value;
             t.details = textBox2.Text;
-            t.duration = Convert.ToInt32(maskedTextBox1.Text);
+            t.duration = Convert.ToDouble(maskedTextBox1.Text);
             t.priority = Convert.ToInt32(maskedTextBox3.Text);
             t.predecessors.Clear();
             foreach (AppLogic.Task v in mainForm.GetCalendar().GetTasks())
@@ -66,12 +68,14 @@ namespace timetable_app
                 t.predecessors.Add(u);
                 u.successors.Add(t);
             }
+            calendar.OrderTasks();
+            calendar.UpdateTaskListControl(mainForm);
+            calendar.SaveTasksToFile();
             Close();
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            
             Close();
 
         }

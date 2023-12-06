@@ -14,6 +14,7 @@ namespace timetable_app.AppLogic
     {
         public string name;
         public double time;
+        public double end;
         public DateTime scheduled;
         public bool completed;
         [NonSerialized]
@@ -42,14 +43,17 @@ namespace timetable_app.AppLogic
             this.duration = duration;
             this.time = time;
             display = new Label();
-            display.Text = name + ", " + (time - (time % 1)) + ":" + (time % 1 * 60) + " - " + ((time + duration) - ((time + duration) % 1)) + ":" + (((time + duration) % 1) * 60) + ", " + scheduled.ToLongDateString();
+            display.Text = name + ", " + (time - (time % 1)) + ":" + (time % 1 * 60) + " - " + (end - (end % 1)) + ":" + ((end % 1) * 60) + ", " + scheduled.ToLongDateString();
             display.Width = 100 + 10 * Convert.ToInt32(duration); //change this based on length of task
             display.Height = 100;
+
+            end = time + duration;
+
 
             display.Location = new Point(100, 100);
             display.BackColor = Color.AliceBlue;
             display.BorderStyle = BorderStyle.Fixed3D;
-            taskDescription = name + ", " + (time - (time % 1)) + ":" + (time % 1 * 60) + " - " + ((time + duration) - (time + duration) % 1) + ":" + ((time + duration) % 1 * 60) + ", " + scheduled.ToLongDateString();
+            taskDescription = name + ", " + (time - (time % 1)) + ":" + (time % 1 * 60) + " - " + (end - (end % 1)) + ":" + ((end % 1) * 60) + ", " + scheduled.ToLongDateString();
             this.taskDescription = taskDescription;
             this.priority = priority;
             this.due = due;
@@ -58,7 +62,7 @@ namespace timetable_app.AppLogic
             this.predecessors2 = new List<Guid>();
             this.successors2 = new List<Guid>();
             this.details = details;
-
+            
             this.ID = Guid.NewGuid();
         }
         public Task(string name, DateTime scheduled, double duration, Double time, bool completed)
