@@ -134,13 +134,15 @@ namespace timetable_app
                     }
                     current.display.Text = current.name + ", " + (current.time - (current.time % 1)) + ":" + (current.time % 1 * 60) + " - " + ((current.time + current.duration) - ((current.time + current.duration) % 1)) + ":" + ((current.time + current.duration) % 1 * 60) + ", " + current.scheduled.ToLongDateString();
                     calendar.OrderTasks();
+                    calendar.OrderDisplay(this);
                     calendar.UpdateTaskListControl(this);
                 }
                 if (e.KeyData == Keys.Space)
                 {
                     if (TaskList.SelectedItem != null && current.display.Created == true)
                     {
-                        this.Controls.Remove(current.display);
+                        //this.Controls.Remove(current.display);
+                        current.display.Visible = false;
                     }
                     calendar.OrderTasks();
                     calendar.UpdateTaskListControl(this);
@@ -227,10 +229,21 @@ namespace timetable_app
                 }
                 foreach(BusyTime u in busyTimes)
                 {
-                    this.Controls.Add(u.display);
-                    u.display.Visible = true;
+                    if (u.scheduled.Date == dateTimePicker1.Value.Date)
+                    {
+                        this.Controls.Add(u.display);
+                        u.display.Visible = true;
+                    }
+                    foreach (AppLogic.Task t in tasks)
+                    {
+                        if (t.scheduled.Date == dateTimePicker1.Value.Date)
+                        {
+
+                        }
+                    }
                 }
             }
+
         }
 
         private void btnWeekView_Click(object sender, EventArgs e)
@@ -447,7 +460,7 @@ namespace timetable_app
 
                 while (j < tasks.Count)
                 {
-                    if (tasks[j].GetType() != typeof(BusyTime))
+                    //if (tasks[j].GetType() != typeof(BusyTime))
                     {
                         tasks[j].scheduled = DateTime.Today;
                         tasks[j].time = 0;
@@ -491,7 +504,7 @@ namespace timetable_app
             while (i < tasks.Count)
             {
                 tasks[i].taskDescription = tasks[i].name + ", " + (tasks[i].time - (tasks[i].time % 1)) + ":" + (tasks[i].time % 1 * 60) + " - " + ((tasks[i].time + tasks[i].duration) - ((tasks[i].time + tasks[i].duration) % 1)) + ":" + ((tasks[i].time + tasks[i].duration) % 1 * 60) + ", " + tasks[i].scheduled.ToLongDateString();
-                if (tasks[i].scheduled.DayOfYear == form.dateTimePicker1.Value.DayOfYear && tasks[i].GetType() != typeof(BusyTime))
+                if (tasks[i].scheduled.DayOfYear == form.dateTimePicker1.Value.DayOfYear /*&& tasks[i].GetType() != typeof(BusyTime)*/)
                 {
                     form.TaskList.Items.Add(tasks[i].taskDescription);
 
@@ -505,6 +518,7 @@ namespace timetable_app
         {
             foreach (AppLogic.Task t in tasks)
             {
+                form.Controls.Add(t.display);
                 foreach (object s in form.TaskList.Items)
                 {
                     if (Convert.ToString(s) == t.taskDescription)
@@ -531,6 +545,13 @@ namespace timetable_app
                         }
                     }
                 }
+                /*if(t.GetType() == typeof(BusyTime))
+                {
+                    foreach (AppLogic.Task u in tasks)
+                    {
+
+                    }
+                }*/
                 if (t.display.Created == true)
                 {
                     t.display.Visible = false;

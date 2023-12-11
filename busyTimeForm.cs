@@ -80,7 +80,16 @@ namespace timetable_app
 
 
             //Calendar calendar = sendingForm.GetCalendar();
+            one.display = new Label();
+            one.display.Text = "example";
+            one.display.Width = 100 + 10 * Convert.ToInt32(duration);
+            one.display.Height = 100;
+            one.display.Location = new Point(100, 100);
+            one.display.BackColor = Color.Red;
+            one.display.BorderStyle = BorderStyle.Fixed3D;
+
             sendingForm.tasks.Add(one);
+            sendingForm.GetCalendar().GetTasks().Add(one);
             sendingForm.busyTimes.Add(one);
             Close();
             

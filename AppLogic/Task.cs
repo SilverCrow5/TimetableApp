@@ -44,7 +44,7 @@ namespace timetable_app.AppLogic
             this.time = time;
             display = new Label();
             display.Text = name + ", " + (time - (time % 1)) + ":" + (time % 1 * 60) + " - " + (end - (end % 1)) + ":" + ((end % 1) * 60) + ", " + scheduled.ToLongDateString();
-            display.Width = 100 + 10 * Convert.ToInt32(duration); //change this based on length of task
+            display.Width = 100 + (10 * Convert.ToInt32(duration)); //change this based on length of task
             display.Height = 100;
 
             end = time + duration;
