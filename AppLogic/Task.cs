@@ -73,6 +73,7 @@ namespace timetable_app.AppLogic
         //Constructor to load from file 
         public Task(SerializationInfo information, StreamingContext context)
         {
+            ID = (Guid)information.GetValue("ID", typeof(Guid));
             name = information.GetString("Name");
             details = information.GetString("Details");
             scheduled = information.GetDateTime("Scheduled");
@@ -81,10 +82,15 @@ namespace timetable_app.AppLogic
             duration = information.GetDouble("Duration");
             priority = information.GetInt16("Priority");
             due = information.GetDateTime("Due");
-            predecessors = new List<Task>();
-            successors = new List<Task>();
-            predecessors2 = new List<Guid>();
-            successors2 = new List<Guid>();
+            //predecessors = new List<Task>();
+            //successors = new List<Task>();
+            //predecessors2 = new List<Guid>();
+            ///successors2 = new List<Guid>();
+
+            successors = (List<Task>)information.GetValue("Successors", typeof(List<Task>));
+            successors2 = (List<Guid>)information.GetValue("Successors2", typeof(List<Guid>));
+            predecessors = (List<Task>)information.GetValue("Predecessors", typeof(List<Task>));
+            predecessors2 = (List<Guid>)information.GetValue("Predecessors2", typeof(List<Guid>));
 
             display = new Label();
             display.Text = name;
@@ -99,6 +105,7 @@ namespace timetable_app.AppLogic
         public void GetObjectData(SerializationInfo information, StreamingContext context)
         {
 
+            information.AddValue("ID", ID);
             information.AddValue("Name", name);
             information.AddValue("Details", details);
             information.AddValue("Scheduled", scheduled);
@@ -123,14 +130,21 @@ namespace timetable_app.AppLogic
                 int i = 1;
                 while (i < list.Count)
                 {
-                    if (list[i].predecessors != null && list[i].predecessors.Count != 0)
+                    if (list[i].predecessors2 != null && list[i].predecessors2.Count != 0)
                     {
-                        foreach (Task t in list[i].predecessors)
+                        foreach (Guid g in list[i].predecessors2)
                         {
-                            if (list[i].estimatedStartTime < t.estimatedFinishTime)
+                            foreach(Task t in list)
                             {
-                                list[i].estimatedStartTime = t.estimatedFinishTime;
+                                if(t.ID == g)
+                                {
+                                    if (list[i].estimatedStartTime < t.estimatedFinishTime)
+                                    {
+                                        list[i].estimatedStartTime = t.estimatedFinishTime;
+                                    }
+                                }
                             }
+
                         }
                         list[i].estimatedFinishTime = list[i].estimatedStartTime + list[i].duration;
                     }
@@ -148,19 +162,25 @@ namespace timetable_app.AppLogic
                 int i = list.Count - 2;
                 while (i >= 0)
                 {
-                    if (list[i].successors != null && list[i].successors.Count != 0)
+                    if (list[i].successors2 != null && list[i].successors2.Count != 0)
                     {
-                        foreach (Task t in list[i].successors)
+                        foreach (Guid g in list[i].successors2)
                         {
-                            if (list[i].latestFinishTime == 0)
+                            foreach (Task t in list)
                             {
-                                list[i].latestFinishTime = t.latestStartTime;
-                            }
-                            else
-                            {
-                                if (list[i].latestFinishTime > t.latestStartTime)
+                                if (t.ID == g)
                                 {
-                                    list[i].latestFinishTime = t.latestStartTime;
+                                    if (list[i].latestFinishTime == 0)
+                                    {
+                                        list[i].latestFinishTime = t.latestStartTime;
+                                    }
+                                    else
+                                    {
+                                        if (list[i].latestFinishTime > t.latestStartTime)
+                                        {
+                                            list[i].latestFinishTime = t.latestStartTime;
+                                        }
+                                    }
                                 }
                             }
                         }

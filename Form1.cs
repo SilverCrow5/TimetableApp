@@ -460,7 +460,7 @@ namespace timetable_app
 
                 while (j < tasks.Count)
                 {
-                    //if (tasks[j].GetType() != typeof(BusyTime))
+                    if (tasks[j].GetType() != typeof(BusyTime))
                     {
                         tasks[j].scheduled = DateTime.Today;
                         tasks[j].time = 0;
@@ -518,7 +518,6 @@ namespace timetable_app
         {
             foreach (AppLogic.Task t in tasks)
             {
-                form.Controls.Add(t.display);
                 foreach (object s in form.TaskList.Items)
                 {
                     if (Convert.ToString(s) == t.taskDescription)
