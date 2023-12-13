@@ -87,9 +87,10 @@ namespace timetable_app
             one.display.Location = new Point(100, 100);
             one.display.BackColor = Color.Red;
             one.display.BorderStyle = BorderStyle.Fixed3D;
+            one.scheduled = dateTimePicker2.Value;
 
-            sendingForm.tasks.Add(one);
-            sendingForm.GetCalendar().GetTasks().Add(one);
+            //sendingForm.tasks.Add(one);
+            //sendingForm.GetCalendar().GetTasks().Add(one);
             sendingForm.busyTimes.Add(one);
             Close();
             

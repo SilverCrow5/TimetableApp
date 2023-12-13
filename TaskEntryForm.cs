@@ -70,7 +70,7 @@ namespace timetable_app
             //https://code-maze.com/sort-list-by-object-property-dotnet/
             //sendingForm.tasks = sendingForm.tasks.OrderBy(x => x.name).ThenBy(x=>x.priority)ToList();
 
-            calendar.OrderTasks();
+            calendar.OrderTasks(sendingForm);
             calendar.UpdateTaskListControl(sendingForm);
             calendar.SaveTasksToFile();
             Close();
@@ -88,7 +88,7 @@ namespace timetable_app
                 int time = 0;
                 AppLogic.Task task = new AppLogic.Task(taskName, description, DateTime.Now, false, time, duration, priority, dateDue);
                 sendingForm.tasks.Add(task);
-                calendar.OrderTasks();
+                calendar.OrderTasks(sendingForm);
                 calendar.UpdateTaskListControl(sendingForm);
                 Close();
             }
