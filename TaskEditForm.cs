@@ -68,6 +68,7 @@ namespace timetable_app
                 t.predecessors.Add(u);
                 u.successors.Add(t);
             }
+            t.end = t.time + t.duration;
             calendar.OrderTasks(mainForm);
             calendar.UpdateTaskListControl(mainForm);
             calendar.SaveTasksToFile();

@@ -103,7 +103,10 @@ namespace timetable_app
                     }*/
                 }
                 if (e.KeyData == Keys.Enter)
-                {                    
+                {
+                    calendar.OrderTasks(this);
+                    calendar.UpdateTaskListControl(this);
+                    calendar.OrderDisplay(this);
                     this.Controls.Add(current.display);
                     if (TaskList.SelectedIndex > 0)
                     {
@@ -133,9 +136,6 @@ namespace timetable_app
                         }
                     }
                     current.display.Text = current.name + ", " + (current.time - (current.time % 1)) + ":" + (current.time % 1 * 60) + " - " + ((current.time + current.duration) - ((current.time + current.duration) % 1)) + ":" + ((current.time + current.duration) % 1 * 60) + ", " + current.scheduled.ToLongDateString();
-                    calendar.OrderTasks(this);
-                    calendar.OrderDisplay(this);
-                    calendar.UpdateTaskListControl(this);
                 }
                 if (e.KeyData == Keys.Space)
                 {
@@ -217,7 +217,10 @@ namespace timetable_app
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
-            if(checkBox1.Checked == true)
+            calendar.OrderTasks(this);
+            calendar.OrderDisplay(this);
+            calendar.UpdateTaskListControl(this);
+            if (checkBox1.Checked == true)
             {
                 /*foreach(AppLogic.Task t in tasks)
                 {
@@ -234,15 +237,15 @@ namespace timetable_app
                         this.Controls.Add(u.display);
                         u.display.Visible = true;
 
-                        foreach (AppLogic.Task t in tasks)
+                        foreach (AppLogic.Task t in calendar.GetTasks())
                         {
                             if (t.scheduled.Date == u.scheduled.Date)
                             {
-                                if (t.time + t.duration == u.time)
+                                if (t.time + t.duration == u.startTime)
                                 {
                                     u.display.Location = new Point(t.display.Location.X + t.display.Width, t.display.Location.Y);
                                 }
-                                if(u.time + u.duration == t.time)
+                                if(u.endTime == t.time)
                                 {
                                     t.display.Location = new Point(u.display.Location.X + u.display.Width, u.display.Location.Y);
                                 }
@@ -258,7 +261,9 @@ namespace timetable_app
                     u.display.Hide();
                 }
             }
-
+            calendar.OrderTasks(this);
+            calendar.UpdateTaskListControl(this);
+            calendar.OrderDisplay(this);
         }
 
         private void btnWeekView_Click(object sender, EventArgs e)
@@ -478,9 +483,13 @@ namespace timetable_app
                     if (tasks[j].GetType() != typeof(BusyTime))
                     {
                         tasks[j].scheduled = DateTime.Today;
-                        tasks[j].time = 0;
+                        //tasks[j].time = 0;
                         tasks[j].Ahead(tasks);
                         tasks[j].Behind(tasks);
+                        foreach (BusyTime a in form.busyTimes)
+                        {
+                            tasks[j].time = availabeCheck(tasks[j], a);
+                        }
                         orderForDay(tasks[j], tasks);
                         if (tasks[j].time + tasks[j].duration > 24)
                         {
@@ -511,7 +520,7 @@ namespace timetable_app
                     }
                     j++;
                 }
-                tasks.OrderByDescending(x => x.time);
+                //tasks.OrderByDescending(x => x.time);
             }
 
 
@@ -544,11 +553,11 @@ namespace timetable_app
                         if (Convert.ToString(s) == t.taskDescription)
                         {
                             AppLogic.Task previous = t;
-                            if (form.TaskList.Items.IndexOf(s) == 0)
+                            if (t.time == 0)
                             {
                                 t.display.Location = new Point(100, 100);
                             }
-                            else
+                            if(form.TaskList.Items.IndexOf(s) != 0)
                             {
                                 foreach (AppLogic.Task u in tasks)
                                 {
@@ -672,19 +681,19 @@ namespace timetable_app
             double number = t.time;
             if(t.scheduled.Date == a.scheduled.Date)
             {
-                if(t.time >= a.startTime && t.time <= a.endTime)
+                if(t.time >= a.startTime && t.time < a.endTime)
                 {
                     number = a.endTime;
                 }
-                if(t.end >= a.startTime && t.end <= a.endTime)
+                if(t.end > a.startTime && t.end <= a.endTime)
                 {
                     number = a.endTime;
                 }
-                if(a.startTime >= t.time && a.startTime <= t.end)
+                if(a.startTime >= t.time && a.startTime < t.end)
                 {
                     number = a.endTime;
                 }
-                if(a.endTime >= t.time && a.endTime <= t.end)
+                if(a.endTime > t.time && a.endTime <= t.end)
                 {
                     number = a.endTime;
                 }

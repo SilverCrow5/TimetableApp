@@ -62,6 +62,7 @@ namespace timetable_app
                 duration = Convert.ToDouble(textBox3.Text) - time;
             }
             BusyTime one = new BusyTime(reason, DateTime.Now, false, time, duration, repeat);
+            one.startTime = Convert.ToInt32(time);
 
             if (textBox3.Text == null)
             {
@@ -81,7 +82,7 @@ namespace timetable_app
 
             //Calendar calendar = sendingForm.GetCalendar();
             one.display = new Label();
-            one.display.Text = "example";
+            one.display.Text = "nothing schedueled: " + (one.startTime - (one.startTime % 1)) + ":" + (one.startTime % 1 * 60) + " - " + (one.endTime - (one.endTime % 1)) + ":" + ((one.endTime % 1) * 60);
             one.display.Width = 100 + 10 * Convert.ToInt32(duration);
             one.display.Height = 100;
             one.display.Location = new Point(100, 100);
@@ -92,6 +93,11 @@ namespace timetable_app
             //sendingForm.tasks.Add(one);
             //sendingForm.GetCalendar().GetTasks().Add(one);
             sendingForm.busyTimes.Add(one);
+
+            sendingForm.GetCalendar().OrderTasks(sendingForm);
+            sendingForm.GetCalendar().OrderDisplay(sendingForm);
+            sendingForm.GetCalendar().UpdateTaskListControl(sendingForm);
+
             Close();
             
         }
