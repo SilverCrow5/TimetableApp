@@ -19,6 +19,8 @@ namespace timetable_app
         List<Label> labelTasks = new List<Label>();
         int width = 100;
         int height = 50;
+        int morning = 9;
+        int night = 9;
         public WeekViewForm(Form1 originalForm, Calendar calendar)
         {
             InitializeComponent();
@@ -65,10 +67,14 @@ namespace timetable_app
                 l.BringToFront();
                 labelTasks.Add(l);
                 this.Controls.Add(l);
-                if(t.time < 9 || t.time > 21)
+                if(t.time < morning || t.time > night + 12)
                 {
                     l.Hide();
                 }
+            }
+            foreach(BusyTime b in calendar.GetBusyTime())
+            {
+
             }
 
 
@@ -103,6 +109,36 @@ namespace timetable_app
             }
            
             Console.WriteLine("boo");
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            if(textBox1.Text.GetType() == typeof(int))
+            {
+                if(Convert.ToInt32(textBox1.Text) < 12)
+                {
+                    morning = Convert.ToInt32(textBox1.Text);
+                }
+            }
+            if(textBox1.Text == null)
+            {
+                morning = 9;
+            }
+        }
+
+        private void textBox2_TextChanged(object sender, EventArgs e)
+        {
+            if(textBox2.Text.GetType() == typeof(int))
+            {
+                if(Convert.ToInt32(textBox2.Text) < 12)
+                {
+                    night = Convert.ToInt32(textBox2.Text);
+                }
+            }
+            if(textBox2.Text == null)
+            {
+                night = 9;
+            }
         }
     }
 }

@@ -237,6 +237,22 @@ namespace timetable_app
                         this.Controls.Add(u.display);
                         u.display.Visible = true;
 
+                        int i = 0;
+                        while (i < busyTimes.IndexOf(u))
+                        {
+                            if (busyTimes[i].scheduled.Date == u.scheduled.Date && busyTimes[i] != u)
+                            {
+                                if (busyTimes[i].time + busyTimes[i].duration == u.startTime)
+                                {
+                                    u.display.Location = new Point(busyTimes[i].display.Location.X + busyTimes[i].display.Width, busyTimes[i].display.Location.Y);
+                                }
+                                if (u.endTime == busyTimes[i].time)
+                                {
+                                    busyTimes[i].display.Location = new Point(u.display.Location.X + u.display.Width, u.display.Location.Y);
+                                }
+                            }
+                            i++;
+                        }
                         foreach (AppLogic.Task t in calendar.GetTasks())
                         {
                             if (t.scheduled.Date == u.scheduled.Date)
@@ -251,6 +267,7 @@ namespace timetable_app
                                 }
                             }
                         }
+
                     }
                 }
             }
@@ -596,6 +613,13 @@ namespace timetable_app
             formatter.Serialize(stream, tasks);
             stream.Close();
         }
+        public void saveBusyTimeToFile()
+        {
+            BinaryFormatter formatter = new BinaryFormatter();
+            Stream stream = new FileStream(@"NewFile.dat", FileMode.Create, FileAccess.Write);
+            formatter.Serialize(stream, busyTimes);
+            stream.Close();
+        }
 
         public void OpenTasksFromFile(Form1 form)
         {
@@ -622,6 +646,28 @@ namespace timetable_app
 
 
 
+        }
+        public void loadBusyTime(Form1 form)
+        {
+            var filePath = @"NewFile.dat";
+            if (!File.Exists(filePath))
+            {
+                var fileCreator = File.Create(filePath);
+                fileCreator.Close();
+            }
+            else
+            {
+                BinaryFormatter formatter = new BinaryFormatter();
+                Stream stream = new FileStream(@"NewFile.dat", FileMode.Open, FileAccess.Read);
+                if (stream.Length > 0)
+                {
+                    busyTimes = (List<BusyTime>)formatter.Deserialize(stream);
+                }
+
+                stream.Close();
+
+            }
+            UpdateTaskListControl(form);
         }
         public void DeleteTasksFromFile(AppLogic.Task t)
         {
