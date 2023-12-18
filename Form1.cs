@@ -230,14 +230,15 @@ namespace timetable_app
                         t.display.Visible = true;
                     }
                 }*/
-                foreach(BusyTime u in busyTimes)
+                calendar.orderBusyTimeDisplay(calendar, busyTimes);
+                foreach (BusyTime u in busyTimes)
                 {
                     if (u.scheduled.Date == dateTimePicker1.Value.Date)
                     {
                         this.Controls.Add(u.display);
                         u.display.Visible = true;
-
-                        int i = 0;
+                        
+                        /*int i = 0;
                         while (i < busyTimes.IndexOf(u))
                         {
                             if (busyTimes[i].scheduled.Date == u.scheduled.Date && busyTimes[i] != u)
@@ -266,8 +267,7 @@ namespace timetable_app
                                     t.display.Location = new Point(u.display.Location.X + u.display.Width, u.display.Location.Y);
                                 }
                             }
-                        }
-
+                        }*/
                     }
                 }
             }
@@ -731,15 +731,15 @@ namespace timetable_app
                 {
                     number = a.endTime;
                 }
-                if(t.end > a.startTime && t.end <= a.endTime)
+                if(t.time + t.duration > a.startTime && t.time + t.duration <= a.endTime)
                 {
                     number = a.endTime;
                 }
-                if(a.startTime >= t.time && a.startTime < t.end)
+                if(a.startTime >= t.time && a.startTime < t.time + t.duration)
                 {
                     number = a.endTime;
                 }
-                if(a.endTime > t.time && a.endTime <= t.end)
+                if(a.endTime > t.time && a.endTime <= t.time + t.duration)
                 {
                     number = a.endTime;
                 }
@@ -758,6 +758,43 @@ namespace timetable_app
                     t.time = tasks[i].time + tasks[i].duration;
                 }
                 i++;
+            }
+        }
+
+        public void orderBusyTimeDisplay(Calendar c, List<BusyTime> busyTimes)
+        {
+            foreach (BusyTime u in busyTimes)
+            {
+                int i = 0;
+                while (i < busyTimes.IndexOf(u))
+                {
+                    if (busyTimes[i].scheduled.Date == u.scheduled.Date && busyTimes[i] != u)
+                    {
+                        if (busyTimes[i].time + busyTimes[i].duration == u.startTime)
+                        {
+                            u.display.Location = new Point(busyTimes[i].display.Location.X + busyTimes[i].display.Width, busyTimes[i].display.Location.Y);
+                        }
+                        if (u.endTime == busyTimes[i].time)
+                        {
+                            busyTimes[i].display.Location = new Point(u.display.Location.X + u.display.Width, u.display.Location.Y);
+                        }
+                    }
+                    i++;
+                }
+                foreach (AppLogic.Task t in c.GetTasks())
+                {
+                    if (t.scheduled.Date == u.scheduled.Date)
+                    {
+                        if (t.time + t.duration == u.startTime)
+                        {
+                            u.display.Location = new Point(t.display.Location.X + t.display.Width, t.display.Location.Y);
+                        }
+                        if (u.endTime == t.time)
+                        {
+                            t.display.Location = new Point(u.display.Location.X + u.display.Width, u.display.Location.Y);
+                        }
+                    }
+                }
             }
         }
     }
