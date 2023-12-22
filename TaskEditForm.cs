@@ -28,7 +28,8 @@ namespace timetable_app
             dateTimePicker2.Value = t.due;
             textBox2.Text = t.details;
             maskedTextBox1.Text = Convert.ToString(t.duration);
-            maskedTextBox2.Text = Convert.ToString(t.time - (t.time % 1)) + ":" + Convert.ToString(t.time % 1 * 60);
+            //maskedTextBox2.Text = Convert.ToString(t.time - (t.time % 1)) + ":" + Convert.ToString(t.time % 1 * 60);
+            maskedTextBox2.Text = Convert.ToString(t.time);
             maskedTextBox3.Text = Convert.ToString(t.priority);
             if (t.predecessors != null)
             {
@@ -50,12 +51,20 @@ namespace timetable_app
 
         private void button1_Click(object sender, EventArgs e)
         {
+            double origionalTime = t.time;
+            double origionalDuration = t.duration;
             t.name = textBox1.Text;
             t.due = dateTimePicker2.Value;
             t.details = textBox2.Text;
             t.duration = Convert.ToDouble(maskedTextBox1.Text);
             t.priority = Convert.ToInt32(maskedTextBox3.Text);
             t.predecessors.Clear();
+            t.time = Convert.ToDouble(maskedTextBox2.Text);
+            if(calendar.availableCheck(mainForm, t) == false)
+            {
+                t.time = origionalTime;
+                t.duration = origionalDuration;
+            }
             foreach (AppLogic.Task v in mainForm.GetCalendar().GetTasks())
             {
                 if (v.successors.Contains(t))
@@ -69,7 +78,7 @@ namespace timetable_app
                 u.successors.Add(t);
             }
             t.end = t.time + t.duration;
-            calendar.OrderTasks(mainForm);
+            //calendar.OrderTasks(mainForm);
             calendar.UpdateTaskListControl(mainForm);
             calendar.SaveTasksToFile();
             Close();

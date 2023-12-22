@@ -84,6 +84,7 @@ namespace timetable_app
                     calendar.AddCompletedTask(current);
                     calendar.GetTasks().Remove(current);
 
+
                     TaskList.Items.Remove(current.taskDescription);
                     this.Controls.Remove(current.display);
                     calendar.DeleteTasksFromFile(current);
@@ -94,6 +95,8 @@ namespace timetable_app
                         calendar.UpdateTaskListControl(this);
                         calendar.OrderDisplay(this);
                     }
+                    calendar.orderBusyTimeDisplay(calendar, busyTimes);
+                    calendar.OrderDisplay(this);
 
                     /*.GetTasks().Count != 0)
                     {   
@@ -107,6 +110,7 @@ namespace timetable_app
                     calendar.OrderTasks(this);
                     calendar.UpdateTaskListControl(this);
                     calendar.OrderDisplay(this);
+                    calendar.orderBusyTimeDisplay(calendar, busyTimes);
                     this.Controls.Add(current.display);
                     if (TaskList.SelectedIndex > 0)
                     {
@@ -505,7 +509,7 @@ namespace timetable_app
                         tasks[j].Behind(tasks);
                         foreach (BusyTime a in form.busyTimes)
                         {
-                            tasks[j].time = availabeCheck(tasks[j], a);
+                            tasks[j].time = Reschedule(tasks[j], a);
                         }
                         orderForDay(tasks[j], tasks);
                         if (tasks[j].time + tasks[j].duration > 24)
@@ -528,7 +532,7 @@ namespace timetable_app
                         orderForDay(tasks[j], tasks);
                         foreach (BusyTime a in form.busyTimes)
                         {
-                            tasks[j].time = availabeCheck(tasks[j], a);
+                            tasks[j].time = Reschedule(tasks[j], a);
                         }
                         if (j < tasks.Count && tasks.Count != 0)
                         {
@@ -721,7 +725,7 @@ namespace timetable_app
                 }
             }
         }
-        public double availabeCheck(AppLogic.Task t, BusyTime a)
+        public double Reschedule(AppLogic.Task t, BusyTime a)
         {
 
             double number = t.time;
@@ -759,6 +763,71 @@ namespace timetable_app
                 }
                 i++;
             }
+        }
+        public void AvailableStartTimes(Form f)
+        {
+            int i = 0;
+            while(i < 24)
+            {
+
+            }
+        }
+        public void AvailableEndTimes(Form f)
+        {
+            int i = 0;
+            while (i < 24)
+            {
+
+            }
+        }
+        public bool availableCheck(Form f, AppLogic.Task t)
+        {
+            bool avilable = true;
+            foreach(AppLogic.Task u in tasks)
+            {
+                if(u != t && u.scheduled.Date == t.scheduled.Date)
+                {
+                    if(t.time >= u.time && t.time < u.time + u.duration)
+                    {
+                        avilable = false;
+                    }
+                    if(t.time + t.duration > u.time && t.time + t.duration <= u.time + u.duration)
+                    {
+                        avilable = false;
+                    }
+                    if(u.time >= t.time && u.time < t.time + t.duration)
+                    {
+                        avilable = false;
+                    }
+                    if(u.time + u.duration > t.time && u.time + u.duration <= t.time + t.duration)
+                    {
+                        avilable = false;
+                    }
+                }
+            }
+            foreach(BusyTime a in busyTimes)
+            {
+                if (t.scheduled.Date == a.scheduled.Date)
+                {
+                    if (t.time >= a.startTime && t.time < a.endTime)
+                    {
+                        avilable = false;
+                    }
+                    if (t.time + t.duration > a.startTime && t.time + t.duration <= a.endTime)
+                    {
+                        avilable = false;
+                    }
+                    if (a.startTime >= t.time && a.startTime < t.time + t.duration)
+                    {
+                        avilable = false;
+                    }
+                    if (a.endTime > t.time && a.endTime <= t.time + t.duration)
+                    {
+                        avilable = false;
+                    }
+                }
+            }
+            return avilable;
         }
 
         public void orderBusyTimeDisplay(Calendar c, List<BusyTime> busyTimes)

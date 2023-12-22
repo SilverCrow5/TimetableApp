@@ -67,7 +67,7 @@ namespace timetable_app
                 l.BringToFront();
                 labelTasks.Add(l);
                 this.Controls.Add(l);
-                if(t.time < 9 || t.time > 9)
+                if(t.time < morning || t.time > night + 12)
                 {
                     l.Hide();
                 }
