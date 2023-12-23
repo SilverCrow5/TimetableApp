@@ -40,6 +40,19 @@ namespace timetable_app
 
             AppLogic.Task task = new AppLogic.Task(taskName, description, DateTime.Now, false, time, duration, priority, dateDue);
 
+            task.fixedTime = false;
+            if(checkBox1.Checked == true)
+            {
+                if(calendar.availableCheck(sendingForm, task) == true)
+                {
+                    task.fixedTime = true;
+                    task.scheduled = dateTimePicker2.Value;
+                    if(maskedTextBox1 != null)
+                    {
+                        task.time = Convert.ToDouble(maskedTextBox1.Text);
+                    }
+                }
+            }
             
             foreach (object o in priorityTaskSelecter.CheckedItems)
             {
@@ -47,8 +60,8 @@ namespace timetable_app
                 {
                     if (t.taskDescription == o.ToString())
                     {
-                        task.predecessors.Add(t);
-                        t.successors.Add(task);
+                        task.predecessors2.Add(t.ID);
+                        t.successors2.Add(task.ID);
                         task.predecessors2.Add(t.ID);
                         t.successors2.Add(task.ID);
                     }
@@ -59,7 +72,7 @@ namespace timetable_app
             //form.TaskList.Items.Add(task.taskDescription); // this is supposed to add it to the list box but won't work and I keep it as a reminder
             calendar.GetTasks().Add(task);
 
-            if (task.successors != null && task.predecessors != null)
+            if (task.successors2 != null && task.predecessors2 != null)
             {
                 task.Ahead(sendingForm.tasks);
                 task.Behind(sendingForm.tasks);
@@ -129,12 +142,46 @@ namespace timetable_app
         {
             this.PreviewKeyDown += TaskEntryForm_KeyDown;
             this.UpdateTaskSelector();
+            maskedTextBox1.Visible = false;
+            maskedTextBox1.Enabled = false;
+            dateTimePicker2.Value = DateTime.Now;
+            dateTimePicker2.Visible = false;
+            dateTimePicker2.Enabled = false;
+            label6.Visible = false;
+            label8.Visible = false;
         }
 
         private void checkedListBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
+            
 
         }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            dateTimePicker2.Value = DateTime.Now;
+            maskedTextBox1.Text = null;
+            if (checkBox1.Checked == true)
+            {
+                maskedTextBox1.Visible = true;
+                maskedTextBox1.Enabled = true;
+                dateTimePicker2.Visible = true;
+                dateTimePicker2.Enabled = true;
+                label6.Visible = true;
+                label8.Visible = true;
+            }
+            if(checkBox1.Checked == false)
+            {
+                maskedTextBox1.Visible = false;
+                maskedTextBox1.Enabled = false;
+                dateTimePicker2.Visible = false;
+                dateTimePicker2.Enabled = false;
+                label6.Visible = false;
+                label8.Visible = false;
+            }
+        }
+
+
     }
 
 }

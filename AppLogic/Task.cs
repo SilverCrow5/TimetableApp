@@ -24,8 +24,8 @@ namespace timetable_app.AppLogic
         public int priority;
         public DateTime due;
         public int displayTime;
-        public List<Task> predecessors;
-        public List<Task> successors;
+        //public List<Task> predecessors;
+        //public List<Task> successors;
         public List<Guid> predecessors2;
         public List<Guid> successors2;
         public string details;
@@ -34,6 +34,7 @@ namespace timetable_app.AppLogic
         public double estimatedFinishTime;
         public double latestFinishTime;
         public Guid ID;
+        public bool fixedTime;
         public Task(string name, string details, DateTime scheduled, bool completed, double time, double duration, int priority, DateTime due)
         {
 
@@ -49,6 +50,7 @@ namespace timetable_app.AppLogic
 
             end = time + duration;
 
+            this.fixedTime = fixedTime;
 
             display.Location = new Point(100, 100);
             display.BackColor = Color.AliceBlue;
@@ -57,8 +59,8 @@ namespace timetable_app.AppLogic
             this.taskDescription = taskDescription;
             this.priority = priority;
             this.due = due;
-            this.predecessors = new List<Task>();
-            this.successors = new List<Task>();
+            //this.predecessors = new List<Task>();
+            //this.successors = new List<Task>();
             this.predecessors2 = new List<Guid>();
             this.successors2 = new List<Guid>();
             this.details = details;
@@ -82,14 +84,15 @@ namespace timetable_app.AppLogic
             duration = information.GetDouble("Duration");
             priority = information.GetInt16("Priority");
             due = information.GetDateTime("Due");
+            fixedTime = information.GetBoolean("FixedTime");
             //predecessors = new List<Task>();
             //successors = new List<Task>();
             //predecessors2 = new List<Guid>();
             ///successors2 = new List<Guid>();
 
-            successors = (List<Task>)information.GetValue("Successors", typeof(List<Task>));
+            //successors = (List<Task>)information.GetValue("Successors", typeof(List<Task>));
             successors2 = (List<Guid>)information.GetValue("Successors2", typeof(List<Guid>));
-            predecessors = (List<Task>)information.GetValue("Predecessors", typeof(List<Task>));
+            //predecessors = (List<Task>)information.GetValue("Predecessors", typeof(List<Task>));
             predecessors2 = (List<Guid>)information.GetValue("Predecessors2", typeof(List<Guid>));
 
             display = new Label();
@@ -114,10 +117,11 @@ namespace timetable_app.AppLogic
             information.AddValue("Duration", duration);
             information.AddValue("Priority", priority);
             information.AddValue("Due", due);
-            information.AddValue("Successors", successors);
-            information.AddValue("Predecessors", predecessors);
+            //information.AddValue("Successors", successors);
+            //information.AddValue("Predecessors", predecessors);
             information.AddValue("Successors2", successors2);
             information.AddValue("Predecessors2", predecessors2);
+            information.AddValue("FixedTime", fixedTime);
 
 
         }

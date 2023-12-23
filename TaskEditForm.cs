@@ -31,12 +31,12 @@ namespace timetable_app
             //maskedTextBox2.Text = Convert.ToString(t.time - (t.time % 1)) + ":" + Convert.ToString(t.time % 1 * 60);
             maskedTextBox2.Text = Convert.ToString(t.time);
             maskedTextBox3.Text = Convert.ToString(t.priority);
-            if (t.predecessors != null)
+            if (t.predecessors2 != null)
             {
                 foreach (AppLogic.Task u in mainForm.GetCalendar().GetTasks())
                 {
                     checkedListBox1.Items.Add(u);
-                    if (t.predecessors.Contains(u))
+                    if (t.predecessors2.Contains(u.ID))
                     {
                         checkedListBox1.SetItemChecked(checkedListBox1.Items.IndexOf(u), true);
                     }
@@ -58,7 +58,7 @@ namespace timetable_app
             t.details = textBox2.Text;
             t.duration = Convert.ToDouble(maskedTextBox1.Text);
             t.priority = Convert.ToInt32(maskedTextBox3.Text);
-            t.predecessors.Clear();
+            t.predecessors2.Clear();
             t.time = Convert.ToDouble(maskedTextBox2.Text);
             if(calendar.availableCheck(mainForm, t) == false)
             {
@@ -67,15 +67,15 @@ namespace timetable_app
             }
             foreach (AppLogic.Task v in mainForm.GetCalendar().GetTasks())
             {
-                if (v.successors.Contains(t))
+                if (v.successors2.Contains(t.ID))
                 {
-                    v.successors.Remove(t);
+                    v.successors2.Remove(t.ID);
                 }
             }
             foreach (AppLogic.Task u in checkedListBox1.CheckedItems)
             {
-                t.predecessors.Add(u);
-                u.successors.Add(t);
+                t.predecessors2.Add(u.ID);
+                u.successors2.Add(t.ID);
             }
             t.end = t.time + t.duration;
             //calendar.OrderTasks(mainForm);

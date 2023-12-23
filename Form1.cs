@@ -19,6 +19,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 using System.Xml.Linq;
 using timetable_app.AppLogic;
+using System.Security.Cryptography;
 
 namespace timetable_app
 {
@@ -496,52 +497,57 @@ namespace timetable_app
             {
                 AppLogic.Task lastAdded = tasks[tasks.Count - 1];
                 tasks = tasks.OrderByDescending(x => x.priority).ThenByDescending(x => x.estimatedStartTime).ThenByDescending(x => x.duration).ToList();
-                tasks[0].time = 0;
+                if (tasks[0].fixedTime == false)
+                {
+                    tasks[0].time = 0;
+                }
                 int j = 0;
 
                 while (j < tasks.Count)
                 {
-                    if (tasks[j].GetType() != typeof(BusyTime))
+                    if (tasks[j].GetType() != typeof(BusyTime) && tasks[j].fixedTime == false)
                     {
-                        tasks[j].scheduled = DateTime.Today;
-                        //tasks[j].time = 0;
-                        tasks[j].Ahead(tasks);
-                        tasks[j].Behind(tasks);
-                        foreach (BusyTime a in form.busyTimes)
+                        tasks[j].time = 0;
+                        if (availableCheck(form, tasks[j]) == false)
                         {
-                            tasks[j].time = Reschedule(tasks[j], a);
-                        }
-                        orderForDay(tasks[j], tasks);
-                        if (tasks[j].time + tasks[j].duration > 24)
-                        {
-                            if (tasks[j].scheduled.AddDays(1).DayOfYear <= tasks[j].due.DayOfYear)
+                            tasks[j].scheduled = DateTime.Today;
+                            tasks[j].Ahead(tasks);
+                            tasks[j].Behind(tasks);
+                            foreach (BusyTime a in form.busyTimes)
                             {
-                                tasks[j].scheduled = tasks[j].scheduled.AddDays(1);
-                                tasks[j].time = 0;
-                                orderForDay(tasks[j], tasks);
+                                tasks[j].time = Reschedule(tasks[j], a);
                             }
-                            else
+                            orderForDay(tasks[j], tasks, form);
+                            if (tasks[j].time + tasks[j].duration > 24)
                             {
-                                MessageBox.Show("There is not enough time to schedule them all");
-                                tasks.Remove(lastAdded);
-                                j--;
+                                if (tasks[j].scheduled.AddDays(1).DayOfYear <= tasks[j].due.DayOfYear)
+                                {
+                                    tasks[j].scheduled = tasks[j].scheduled.AddDays(1);
+                                    tasks[j].time = 0;
+                                    orderForDay(tasks[j], tasks, form);
+                                }
+                                else
+                                {
+                                    MessageBox.Show("There is not enough time to schedule them all");
+                                    tasks.Remove(lastAdded);
+                                    j--;
+                                }
+                                //OrderTasks(); makes it all go wrong
                             }
-                            //OrderTasks(); makes it all go wrong
-                        }
-                        int i = 0;
-                        orderForDay(tasks[j], tasks);
-                        foreach (BusyTime a in form.busyTimes)
-                        {
-                            tasks[j].time = Reschedule(tasks[j], a);
-                        }
-                        if (j < tasks.Count && tasks.Count != 0)
-                        {
-                            tasks[j].taskDescription = tasks[j].name + ", " + (tasks[j].time - (tasks[j].time % 1)) + ":" + (tasks[j].time % 1 * 60) + " - " + ((tasks[j].time + tasks[j].duration) - (tasks[j].time + tasks[j].duration % 1)) + ":" + ((tasks[j].time + tasks[j].duration) % 1 * 60) + ", " + tasks[j].scheduled.ToLongDateString();
+                            orderForDay(tasks[j], tasks, form);
+                            foreach (BusyTime a in form.busyTimes)
+                            {
+                                tasks[j].time = Reschedule(tasks[j], a);
+                            }
+                            if (j < tasks.Count && tasks.Count != 0)
+                            {
+                                tasks[j].taskDescription = tasks[j].name + ", " + (tasks[j].time - (tasks[j].time % 1)) + ":" + (tasks[j].time % 1 * 60) + " - " + ((tasks[j].time + tasks[j].duration) - (tasks[j].time + tasks[j].duration % 1)) + ":" + ((tasks[j].time + tasks[j].duration) % 1 * 60) + ", " + tasks[j].scheduled.ToLongDateString();
+                            }
                         }
                     }
                     j++;
                 }
-                //tasks.OrderByDescending(x => x.time);
+                tasks = tasks.OrderBy(x => x.time).ToList();
             }
 
 
@@ -751,11 +757,11 @@ namespace timetable_app
             }
             return number;
         }
-        public void orderForDay(AppLogic.Task t, List<AppLogic.Task> list)
+        public void orderForDay(AppLogic.Task t, List<AppLogic.Task> list, Form f)
         {
             int i = 0;
             int j = list.IndexOf(t);
-            while (i < j)
+            while (i < j && availableCheck(f, t) == false)
             {
                 if (t.scheduled.DayOfYear == tasks[i].scheduled.DayOfYear)
                 {
@@ -787,21 +793,24 @@ namespace timetable_app
             {
                 if(u != t && u.scheduled.Date == t.scheduled.Date)
                 {
-                    if(t.time >= u.time && t.time < u.time + u.duration)
+                    if (u.fixedTime == true || t.fixedTime == false)
                     {
-                        avilable = false;
-                    }
-                    if(t.time + t.duration > u.time && t.time + t.duration <= u.time + u.duration)
-                    {
-                        avilable = false;
-                    }
-                    if(u.time >= t.time && u.time < t.time + t.duration)
-                    {
-                        avilable = false;
-                    }
-                    if(u.time + u.duration > t.time && u.time + u.duration <= t.time + t.duration)
-                    {
-                        avilable = false;
+                        if (t.time >= u.time && t.time < u.time + u.duration)
+                        {
+                            avilable = false;
+                        }
+                        if (t.time + t.duration > u.time && t.time + t.duration <= u.time + u.duration)
+                        {
+                            avilable = false;
+                        }
+                        if (u.time >= t.time && u.time < t.time + t.duration)
+                        {
+                            avilable = false;
+                        }
+                        if (u.time + u.duration > t.time && u.time + u.duration <= t.time + t.duration)
+                        {
+                            avilable = false;
+                        }
                     }
                 }
             }
