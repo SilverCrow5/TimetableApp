@@ -27,8 +27,8 @@ namespace timetable_app
     {
         Pen pen;
         Graphics graphics;
-        public List<AppLogic.Task> tasks;
-        public List<BusyTime> busyTimes;
+        //public List<AppLogic.Task> tasks;
+        //public List<BusyTime> busyTimes;
         public int i = 1;
         public List<AppLogic.Task> completedTasks;
 
@@ -42,8 +42,8 @@ namespace timetable_app
             DateTime now = DateTime.Now;
             graphics = this.CreateGraphics();
             pen = new Pen(Brushes.Black);
-            tasks = new List<AppLogic.Task>();
-            busyTimes = new List<BusyTime>();
+            //tasks = new List<AppLogic.Task>();
+            //busyTimes = new List<BusyTime>();
             completedTasks = new List<AppLogic.Task>();
             calendar = new Calendar();
             textBox1.Text = Convert.ToString(now.DayOfWeek);
@@ -96,7 +96,7 @@ namespace timetable_app
                         calendar.UpdateTaskListControl(this);
                         calendar.OrderDisplay(this);
                     }
-                    calendar.orderBusyTimeDisplay(calendar, busyTimes);
+                    calendar.orderBusyTimeDisplay(calendar, calendar.GetBusyTime());
                     calendar.OrderDisplay(this);
 
                     /*.GetTasks().Count != 0)
@@ -111,7 +111,7 @@ namespace timetable_app
                     calendar.OrderTasks(this);
                     calendar.UpdateTaskListControl(this);
                     calendar.OrderDisplay(this);
-                    calendar.orderBusyTimeDisplay(calendar, busyTimes);
+                    calendar.orderBusyTimeDisplay(calendar, calendar.GetBusyTime());
                     this.Controls.Add(current.display);
                     if (TaskList.SelectedIndex > 0)
                     {
@@ -177,7 +177,7 @@ namespace timetable_app
         private void dateTimePicker1_ValueChanged(object sender, EventArgs e)
         {
 
-            calendar.OrderTasks(this);
+            //calendar.OrderTasks(this);
             calendar.UpdateTaskListControl(this);
             calendar.OrderDisplay(this);
         }
@@ -235,8 +235,8 @@ namespace timetable_app
                         t.display.Visible = true;
                     }
                 }*/
-                calendar.orderBusyTimeDisplay(calendar, busyTimes);
-                foreach (BusyTime u in busyTimes)
+                calendar.orderBusyTimeDisplay(calendar, calendar.GetBusyTime());
+                foreach (BusyTime u in calendar.GetBusyTime())
                 {
                     if (u.scheduled.Date == dateTimePicker1.Value.Date)
                     {
@@ -278,7 +278,7 @@ namespace timetable_app
             }
             if(checkBox1.Checked == false)
             {
-                foreach(BusyTime u in busyTimes)
+                foreach(BusyTime u in calendar.GetBusyTime())
                 {
                     u.display.Hide();
                 }
@@ -496,7 +496,9 @@ namespace timetable_app
             if (tasks.Count > 0)
             {
                 AppLogic.Task lastAdded = tasks[tasks.Count - 1];
-                tasks = tasks.OrderByDescending(x => x.priority).ThenByDescending(x => x.estimatedStartTime).ThenByDescending(x => x.duration).ToList();
+                tasks = Ahead(tasks);
+                tasks = Behind(tasks);
+                tasks = tasks.OrderByDescending(x => x.priority).ThenBy(x => x.earliestStartTime).ThenByDescending(x => x.duration).ToList();
                 if (tasks[0].fixedTime == false)
                 {
                     tasks[0].time = 0;
@@ -507,13 +509,14 @@ namespace timetable_app
                 {
                     if (tasks[j].GetType() != typeof(BusyTime) && tasks[j].fixedTime == false)
                     {
+                        tasks = tasks[j].Ahead(tasks);
+                        tasks = tasks[j].Behind(tasks);
+                        tasks = tasks.OrderByDescending(x => x.priority).ThenBy(x => x.earliestStartTime).ThenByDescending(x => x.duration).ToList();
                         tasks[j].time = 0;
                         if (availableCheck(form, tasks[j]) == false)
                         {
                             tasks[j].scheduled = DateTime.Today;
-                            tasks[j].Ahead(tasks);
-                            tasks[j].Behind(tasks);
-                            foreach (BusyTime a in form.busyTimes)
+                            foreach (BusyTime a in busyTimes)
                             {
                                 tasks[j].time = Reschedule(tasks[j], a);
                             }
@@ -535,7 +538,7 @@ namespace timetable_app
                                 //OrderTasks(); makes it all go wrong
                             }
                             orderForDay(tasks[j], tasks, form);
-                            foreach (BusyTime a in form.busyTimes)
+                            foreach (BusyTime a in busyTimes)
                             {
                                 tasks[j].time = Reschedule(tasks[j], a);
                             }
@@ -547,6 +550,7 @@ namespace timetable_app
                     }
                     j++;
                 }
+                //tasks = tasks.OrderByDescending(x => x.priority).ThenByDescending(x => x.earliestStartTime).ThenByDescending(x => x.duration).ToList();
                 tasks = tasks.OrderBy(x => x.time).ToList();
             }
 
@@ -761,11 +765,15 @@ namespace timetable_app
         {
             int i = 0;
             int j = list.IndexOf(t);
-            while (i < j && availableCheck(f, t) == false)
+            while (i < list.Count && availableCheck(f, t) == false)
             {
-                if (t.scheduled.DayOfYear == tasks[i].scheduled.DayOfYear)
+                if (t.predecessors2.Contains(list[i].ID) && t.scheduled.Date < list[i].scheduled.Date)
                 {
-                    t.time = tasks[i].time + tasks[i].duration;
+                    t.scheduled = list[i].scheduled;
+                }
+                if (t.scheduled.DayOfYear == list[i].scheduled.DayOfYear)
+                {
+                    t.time = list[i].time + list[i].duration;
                 }
                 i++;
             }
@@ -793,7 +801,7 @@ namespace timetable_app
             {
                 if(u != t && u.scheduled.Date == t.scheduled.Date)
                 {
-                    if (u.fixedTime == true || t.fixedTime == false)
+                    if (u.fixedTime == true || (t.fixedTime == false && tasks.IndexOf(u) < tasks.IndexOf(t)))
                     {
                         if (t.time >= u.time && t.time < u.time + u.duration)
                         {
@@ -811,6 +819,17 @@ namespace timetable_app
                         {
                             avilable = false;
                         }
+                    }
+                }
+                if(t.predecessors2.Contains(u.ID))
+                {
+                    if(t.scheduled.Date < u.scheduled.Date)
+                    {
+                        avilable = false;
+                    }
+                    if(t.scheduled.Date == u.scheduled.Date && t.time <= u.time)
+                    {
+                        avilable = false;
                     }
                 }
             }
@@ -839,7 +858,7 @@ namespace timetable_app
             return avilable;
         }
 
-        public void orderBusyTimeDisplay(Calendar c, List<BusyTime> busyTimes)
+        public void orderBusyTimeDisplay(Calendar c, List<BusyTime> busyTimes) // I had this in the task class form but figured it would be better here
         {
             foreach (BusyTime u in busyTimes)
             {
@@ -873,6 +892,92 @@ namespace timetable_app
                         }
                     }
                 }
+            }
+        }
+        public List<AppLogic.Task> Ahead(List<AppLogic.Task> list)
+        {
+            if (list.Count != 0)
+            {
+                list[0].earliestFinishTime = list[0].earliestStartTime + list[0].duration;
+                int i = 1;
+                while (i < list.Count)
+                {
+                    if (list[i].predecessors2 != null && list[i].predecessors2.Count != 0)
+                    {
+                        foreach (Guid g in list[i].predecessors2)
+                        {
+                            foreach (AppLogic.Task t in list)
+                            {
+                                if (t.ID == g)
+                                {
+                                    if (list[i].earliestStartTime < t.earliestFinishTime)
+                                    {
+                                        list[i].earliestStartTime = t.earliestFinishTime;
+                                    }
+                                }
+                            }
+
+                        }
+                        list[i].earliestFinishTime = list[i].earliestStartTime + list[i].duration;
+                    }
+                    i++;
+                }
+            }
+            return list;
+        }
+        public List<AppLogic.Task> Behind(List<AppLogic.Task> list)
+        {
+            if (list.Count != 0)
+            {
+                list[list.Count - 1].latestFinishTime = list[list.Count - 1].earliestFinishTime;
+                list[list.Count - 1].latestStartTime = list[list.Count - 1].latestFinishTime - list[list.Count - 1].duration;
+                int i = list.Count - 2;
+                while (i >= 0)
+                {
+                    if (list[i].successors2 != null && list[i].successors2.Count != 0)
+                    {
+                        foreach (Guid g in list[i].successors2)
+                        {
+                            foreach (AppLogic.Task t in list)
+                            {
+                                if (t.ID == g)
+                                {
+                                    if (list[i].latestFinishTime == 0)
+                                    {
+                                        list[i].latestFinishTime = t.latestStartTime;
+                                    }
+                                    else
+                                    {
+                                        if (list[i].latestFinishTime > t.latestStartTime)
+                                        {
+                                            list[i].latestFinishTime = t.latestStartTime;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    i--;
+                }
+            }
+            return list;
+        }
+
+        public void CritPath(List<AppLogic.Task> list)
+        {
+            Console.WriteLine("\n    Critical Path: ");
+
+            if (list.Count != 0)
+            {
+                foreach (AppLogic.Task t in list)
+                {
+                    if ((t.earliestFinishTime - t.latestFinishTime == 0) && (t.earliestFinishTime - t.latestStartTime == 0))
+                    {
+                        Console.WriteLine("{0}", t.name);
+                    }
+
+                }
+                Console.WriteLine("\n\n     Total duration: {0}\n\n", list[list.Count - 1].earliestFinishTime);
             }
         }
     }

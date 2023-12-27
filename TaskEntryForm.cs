@@ -74,9 +74,9 @@ namespace timetable_app
 
             if (task.successors2 != null && task.predecessors2 != null)
             {
-                task.Ahead(sendingForm.tasks);
-                task.Behind(sendingForm.tasks);
-                task.CritPath(sendingForm.tasks);
+                task.Ahead(calendar.GetTasks());
+                task.Behind(calendar.GetTasks());
+                task.CritPath(calendar.GetTasks());
             }
 
 
@@ -100,7 +100,7 @@ namespace timetable_app
                 int priority = Convert.ToInt32(maskedTextBox3.Text);
                 int time = 0;
                 AppLogic.Task task = new AppLogic.Task(taskName, description, DateTime.Now, false, time, duration, priority, dateDue);
-                sendingForm.tasks.Add(task);
+                calendar.GetTasks().Add(task);
                 calendar.OrderTasks(sendingForm);
                 calendar.UpdateTaskListControl(sendingForm);
                 Close();
@@ -181,7 +181,15 @@ namespace timetable_app
             }
         }
 
+        private void textBox2_TextChanged(object sender, EventArgs e)
+        {
 
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 
 }

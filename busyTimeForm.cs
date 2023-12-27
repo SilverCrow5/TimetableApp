@@ -92,7 +92,7 @@ namespace timetable_app
 
             //sendingForm.tasks.Add(one);
             //sendingForm.GetCalendar().GetTasks().Add(one);
-            sendingForm.busyTimes.Add(one);
+            calendar.GetBusyTime().Add(one);
 
             sendingForm.GetCalendar().OrderTasks(sendingForm);
             sendingForm.GetCalendar().OrderDisplay(sendingForm);

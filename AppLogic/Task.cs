@@ -29,9 +29,9 @@ namespace timetable_app.AppLogic
         public List<Guid> predecessors2;
         public List<Guid> successors2;
         public string details;
-        public double estimatedStartTime;
+        public double earliestStartTime;
         public double latestStartTime;
-        public double estimatedFinishTime;
+        public double earliestFinishTime;
         public double latestFinishTime;
         public Guid ID;
         public bool fixedTime;
@@ -126,11 +126,11 @@ namespace timetable_app.AppLogic
 
         }
 
-        public List<Task> Ahead(List<Task> list)
+        public List<Task> Ahead(List<Task> list) // starting to wonder why I put it in this form, I have moved it to the calendar class in the main form for now
         {
             if (list.Count != 0)
             {
-                list[0].estimatedFinishTime = list[0].estimatedStartTime + list[0].duration;
+                list[0].earliestFinishTime = list[0].earliestStartTime + list[0].duration;
                 int i = 1;
                 while (i < list.Count)
                 {
@@ -142,16 +142,16 @@ namespace timetable_app.AppLogic
                             {
                                 if(t.ID == g)
                                 {
-                                    if (list[i].estimatedStartTime < t.estimatedFinishTime)
+                                    if (list[i].earliestStartTime < t.earliestFinishTime)
                                     {
-                                        list[i].estimatedStartTime = t.estimatedFinishTime;
+                                        list[i].earliestStartTime = t.earliestFinishTime;
                                     }
                                 }
                             }
 
                         }
-                        list[i].estimatedFinishTime = list[i].estimatedStartTime + list[i].duration;
                     }
+                    list[i].earliestFinishTime = list[i].earliestStartTime + list[i].duration;
                     i++;
                 }
             }
@@ -161,7 +161,7 @@ namespace timetable_app.AppLogic
         {
             if (list.Count != 0)
             {
-                list[list.Count - 1].latestFinishTime = list[list.Count - 1].estimatedFinishTime;
+                list[list.Count - 1].latestFinishTime = list[list.Count - 1].earliestFinishTime;
                 list[list.Count - 1].latestStartTime = list[list.Count - 1].latestFinishTime - list[list.Count - 1].duration;
                 int i = list.Count - 2;
                 while (i >= 0)
@@ -203,13 +203,13 @@ namespace timetable_app.AppLogic
             {
                 foreach (Task t in list)
                 {
-                    if ((t.estimatedFinishTime - t.latestFinishTime == 0) && (t.estimatedFinishTime - t.latestStartTime == 0))
+                    if ((t.earliestFinishTime - t.latestFinishTime == 0) && (t.earliestFinishTime - t.latestStartTime == 0))
                     {
                         Console.WriteLine("{0}", t.name);
                     }
 
                 }
-                Console.WriteLine("\n\n     Total duration: {0}\n\n", list[list.Count - 1].estimatedFinishTime);
+                Console.WriteLine("\n\n     Total duration: {0}\n\n", list[list.Count - 1].earliestFinishTime);
             }
         }
 
