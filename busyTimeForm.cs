@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -33,6 +34,35 @@ namespace timetable_app
             {
                 textBox1.Text = Convert.ToString(Convert.ToInt32(textBox3.Text) - Convert.ToInt32(textBox2.Text));
             }
+
+        }
+
+        public bool Available(BusyTime b, List<AppLogic.Task> tasks)
+        {
+            bool available = true;
+            foreach(AppLogic.Task t in tasks)
+            {
+                if(t.fixedTime == true && t.scheduled.DayOfYear == b.scheduled.DayOfYear)
+                {
+                    if(b.startTime >= t.time && b.startTime < (t.time + t.duration))
+                    {
+                        available = false;
+                    }
+                    if(b.endTime > t.time && b.endTime <= (t.time + t.duration))
+                    {
+                        available = false;
+                    }
+                    if(t.time >= b.startTime && t.time < b.endTime)
+                    {
+                        available = false;
+                    }
+                    if((t.time + t.duration) > b.startTime && (t.time + t.duration) <= b.endTime)
+                    {
+                        available = false;
+                    }
+                }
+            }
+            return available;
         }
 
         private void busyTimeForm_Load(object sender, EventArgs e)
@@ -92,7 +122,14 @@ namespace timetable_app
 
             //sendingForm.tasks.Add(one);
             //sendingForm.GetCalendar().GetTasks().Add(one);
-            calendar.GetBusyTime().Add(one);
+            if (Available(one, calendar.GetTasks()) == true)
+            {
+                calendar.GetBusyTime().Add(one);
+            }
+            if (Available(one, calendar.GetTasks()) == false)
+            {
+                MessageBox.Show("You alrady have a task schedueled at that time");
+            }
 
             sendingForm.GetCalendar().OrderTasks(sendingForm);
             sendingForm.GetCalendar().OrderDisplay(sendingForm);

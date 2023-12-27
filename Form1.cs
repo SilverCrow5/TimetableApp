@@ -513,9 +513,9 @@ namespace timetable_app
                         tasks = tasks[j].Behind(tasks);
                         tasks = tasks.OrderByDescending(x => x.priority).ThenBy(x => x.earliestStartTime).ThenByDescending(x => x.duration).ToList();
                         tasks[j].time = 0;
+                        tasks[j].scheduled = DateTime.Today;
                         if (availableCheck(form, tasks[j]) == false)
                         {
-                            tasks[j].scheduled = DateTime.Today;
                             foreach (BusyTime a in busyTimes)
                             {
                                 tasks[j].time = Reschedule(tasks[j], a);
