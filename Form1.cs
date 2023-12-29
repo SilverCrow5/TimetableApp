@@ -34,6 +34,8 @@ namespace timetable_app
 
         Calendar calendar;
         TableLayoutPanel layoutPanel;
+        User user;
+        
 
         public Form1()
         {
@@ -46,6 +48,12 @@ namespace timetable_app
             //busyTimes = new List<BusyTime>();
             completedTasks = new List<AppLogic.Task>();
             calendar = new Calendar();
+            user = new User();
+            user.morningTime = 0;
+            user.nightTime = 24;
+            user.taskColour = Color.AliceBlue;
+            user.busyTimeColour = Color.Red;
+            user.calendarColour = Color.Gray;
             textBox1.Text = Convert.ToString(now.DayOfWeek);
             
             void display(AppLogic.Task one)
@@ -61,7 +69,8 @@ namespace timetable_app
             calendar.OpenTasksFromFile(this);
             calendar.OrderTasks(this);
             calendar.UpdateTaskListControl(this);
-            calendar.OrderDisplay(this);
+            calendar.OrderDisplay(this, user);
+
         }
 
 
@@ -94,10 +103,10 @@ namespace timetable_app
                     {
                         calendar.OrderTasks(this);
                         calendar.UpdateTaskListControl(this);
-                        calendar.OrderDisplay(this);
+                        calendar.OrderDisplay(this, user);
                     }
                     calendar.orderBusyTimeDisplay(calendar, calendar.GetBusyTime());
-                    calendar.OrderDisplay(this);
+                    calendar.OrderDisplay(this, user);
 
                     /*.GetTasks().Count != 0)
                     {   
@@ -110,7 +119,7 @@ namespace timetable_app
                 {
                     calendar.OrderTasks(this);
                     calendar.UpdateTaskListControl(this);
-                    calendar.OrderDisplay(this);
+                    calendar.OrderDisplay(this, user);
                     calendar.orderBusyTimeDisplay(calendar, calendar.GetBusyTime());
                     this.Controls.Add(current.display);
                     if (TaskList.SelectedIndex > 0)
@@ -127,7 +136,7 @@ namespace timetable_app
                             }
                             k++;
                         }
-                        calendar.OrderDisplay(this);
+                        calendar.OrderDisplay(this, user);
                         current.display.Location = new Point(Convert.ToInt32(calendar.GetTasks()[previous].display.Location.X) + Convert.ToInt32(calendar.GetTasks()[previous].display.Width), Convert.ToInt32(calendar.GetTasks()[previous].display.Location.Y));
 
 
@@ -179,7 +188,7 @@ namespace timetable_app
 
             //calendar.OrderTasks(this);
             calendar.UpdateTaskListControl(this);
-            calendar.OrderDisplay(this);
+            calendar.OrderDisplay(this, user);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -216,14 +225,14 @@ namespace timetable_app
 
         private void button1_Click_1(object sender, EventArgs e)
         {
-            var frm = new busyTimeForm(this, calendar);
+            var frm = new busyTimeForm(this, calendar, user);
             frm.ShowDialog();
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
             calendar.OrderTasks(this);
-            calendar.OrderDisplay(this);
+            calendar.OrderDisplay(this, user);
             calendar.UpdateTaskListControl(this);
             if (checkBox1.Checked == true)
             {
@@ -285,13 +294,19 @@ namespace timetable_app
             }
             calendar.OrderTasks(this);
             calendar.UpdateTaskListControl(this);
-            calendar.OrderDisplay(this);
+            calendar.OrderDisplay(this, user);
         }
 
         private void btnWeekView_Click(object sender, EventArgs e)
         {
             var frm = new WeekViewForm(this, calendar);
             frm.ShowDialog();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            var form = new SettingsForm(this, calendar, user);
+            form.ShowDialog();
         }
     }
     /*
@@ -573,12 +588,13 @@ namespace timetable_app
                 i++;
             }
         }
-        public void OrderDisplay(Form1 form)
+        public void OrderDisplay(Form1 form, User user)
         {
             foreach (AppLogic.Task t in tasks)
             {
                 if(t.GetType() != typeof(BusyTime))
                 {
+                    t.display.BackColor = user.taskColour;
                     foreach (object s in form.TaskList.Items)
                     {
                         if (Convert.ToString(s) == t.taskDescription)
@@ -707,7 +723,7 @@ namespace timetable_app
             }
         }
 
-        public void Clearing(List<AppLogic.Task> tasks, Form1 form, Calendar calendar)
+        public void Clearing(List<AppLogic.Task> tasks, Form1 form, User user)
         {
             foreach (AppLogic.Task t in tasks)
             {
@@ -722,16 +738,16 @@ namespace timetable_app
                     SaveTasksToFile();
                     if (tasks.Count != 0)
                     {
-                        calendar.OrderTasks(form);
-                        calendar.UpdateTaskListControl(form);
-                        calendar.OrderDisplay(form);
+                        this.OrderTasks(form);
+                        this.UpdateTaskListControl(form);
+                        this.OrderDisplay(form, user);
                     }
                 }
                 if (t.scheduled.DayOfYear < DateTime.Now.DayOfYear)
                 {
-                    calendar.OrderTasks(form);
-                    calendar.UpdateTaskListControl(form);
-                    calendar.OrderDisplay(form);
+                    this.OrderTasks(form);
+                    this.UpdateTaskListControl(form);
+                    this.OrderDisplay(form, user);
                 }
             }
         }

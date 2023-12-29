@@ -23,7 +23,6 @@ namespace timetable_app.AppLogic
         public string taskDescription;
         public int priority;
         public DateTime due;
-        public int displayTime;
         //public List<Task> predecessors;
         //public List<Task> successors;
         public List<Guid> predecessors2;
@@ -35,6 +34,7 @@ namespace timetable_app.AppLogic
         public double latestFinishTime;
         public Guid ID;
         public bool fixedTime;
+        
         public Task(string name, string details, DateTime scheduled, bool completed, double time, double duration, int priority, DateTime due)
         {
 

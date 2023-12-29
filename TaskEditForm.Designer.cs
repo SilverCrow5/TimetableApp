@@ -222,7 +222,7 @@
             this.Controls.Add(this.textBox2);
             this.Controls.Add(this.textBox1);
             this.Name = "TaskEditForm";
-            this.Text = "TaskEditForm";
+            this.Text = "edit task";
             this.Load += new System.EventHandler(this.TaskEditForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

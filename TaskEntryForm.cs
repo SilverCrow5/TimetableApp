@@ -52,6 +52,11 @@ namespace timetable_app
                         task.time = Convert.ToDouble(maskedTextBox1.Text);
                     }
                 }
+                if(calendar.availableCheck(sendingForm, task) == false)
+                {
+                    task.fixedTime = false;
+                    MessageBox.Show("That time is not available, " + task.name + " will be reschedueled");
+                }
             }
             
             foreach (object o in priorityTaskSelecter.CheckedItems)

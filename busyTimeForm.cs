@@ -16,11 +16,13 @@ namespace timetable_app
     {
         Form1 sendingForm;
         Calendar calendar;
-        public busyTimeForm(Form1 sendingForm, Calendar calendar)
+        User user;
+        public busyTimeForm(Form1 sendingForm, Calendar calendar, User user)
         {
             InitializeComponent();
             this.calendar = calendar;
             this.sendingForm = sendingForm;
+            this.user = user;
 
             if(textBox1.Text != "" && textBox2.Text != "")
             {
@@ -132,7 +134,7 @@ namespace timetable_app
             }
 
             sendingForm.GetCalendar().OrderTasks(sendingForm);
-            sendingForm.GetCalendar().OrderDisplay(sendingForm);
+            sendingForm.GetCalendar().OrderDisplay(sendingForm, user);
             sendingForm.GetCalendar().UpdateTaskListControl(sendingForm);
 
             Close();
