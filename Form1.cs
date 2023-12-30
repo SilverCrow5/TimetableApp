@@ -53,7 +53,7 @@ namespace timetable_app
             user.nightTime = 24;
             user.taskColour = Color.AliceBlue;
             user.busyTimeColour = Color.Red;
-            user.calendarColour = Color.Gray;
+            user.calendarColour = DefaultBackColor; // I don't know the colour's name
             textBox1.Text = Convert.ToString(now.DayOfWeek);
             
             void display(AppLogic.Task one)
@@ -67,10 +67,12 @@ namespace timetable_app
         {
             //TaskList.PreviewKeyDown += TaskList_KeyDown;
             calendar.OpenTasksFromFile(this);
-            calendar.OrderTasks(this);
+            calendar.rememberPreferances(this, user);
+            calendar.OrderTasks(this, user);
             calendar.UpdateTaskListControl(this);
             calendar.OrderDisplay(this, user);
-
+            calendar.Clearing(calendar.GetTasks(), this, user);
+            BackColor = user.calendarColour;
         }
 
 
@@ -90,23 +92,25 @@ namespace timetable_app
                 AppLogic.Task current = calendar.GetTasks()[i];
                 if (e.KeyData == Keys.Delete)
                 {
-                    this.Controls.Remove(current.display);
+                    var form = new YesNoForm(current, this, calendar, user); // figured I might was well use it here too
+                    form.ShowDialog();
+
+                    
+                    /*this.Controls.Remove(current.display);
                     calendar.AddCompletedTask(current);
                     calendar.GetTasks().Remove(current);
 
 
                     TaskList.Items.Remove(current.taskDescription);
-                    this.Controls.Remove(current.display);
                     calendar.DeleteTasksFromFile(current);
                     calendar.SaveTasksToFile();
                     if (calendar.GetTasks().Count != 0)
                     {
-                        calendar.OrderTasks(this);
+                        calendar.OrderTasks(this, user);
                         calendar.UpdateTaskListControl(this);
-                        calendar.OrderDisplay(this, user);
                     }
-                    calendar.orderBusyTimeDisplay(calendar, calendar.GetBusyTime());
-                    calendar.OrderDisplay(this, user);
+                    calendar.orderBusyTimeDisplay(calendar, user);
+                    calendar.OrderDisplay(this, user);*/
 
                     /*.GetTasks().Count != 0)
                     {   
@@ -117,10 +121,10 @@ namespace timetable_app
                 }
                 if (e.KeyData == Keys.Enter)
                 {
-                    calendar.OrderTasks(this);
+                    calendar.OrderTasks(this, user);
                     calendar.UpdateTaskListControl(this);
                     calendar.OrderDisplay(this, user);
-                    calendar.orderBusyTimeDisplay(calendar, calendar.GetBusyTime());
+                    calendar.orderBusyTimeDisplay(calendar, user);
                     this.Controls.Add(current.display);
                     if (TaskList.SelectedIndex > 0)
                     {
@@ -158,12 +162,12 @@ namespace timetable_app
                         //this.Controls.Remove(current.display);
                         current.display.Visible = false;
                     }
-                    calendar.OrderTasks(this);
+                    calendar.OrderTasks(this, user);
                     calendar.UpdateTaskListControl(this);
                 }
                 if (e.KeyData == Keys.E)
                 {
-                    var frm = new TaskEditForm(this, current, calendar);
+                    var frm = new TaskEditForm(this, current, calendar, user);
                     frm.ShowDialog();
 
 
@@ -204,7 +208,7 @@ namespace timetable_app
         private void button2_Click(object sender, EventArgs e)
         {
             // Form1 form = new Form1();
-            var frm = new TaskEntryForm(this, calendar);
+            var frm = new TaskEntryForm(this, calendar, user);
             frm.ShowDialog();
         }
 
@@ -231,7 +235,7 @@ namespace timetable_app
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
-            calendar.OrderTasks(this);
+            calendar.OrderTasks(this, user);
             calendar.OrderDisplay(this, user);
             calendar.UpdateTaskListControl(this);
             if (checkBox1.Checked == true)
@@ -244,7 +248,7 @@ namespace timetable_app
                         t.display.Visible = true;
                     }
                 }*/
-                calendar.orderBusyTimeDisplay(calendar, calendar.GetBusyTime());
+                calendar.orderBusyTimeDisplay(calendar, user);
                 foreach (BusyTime u in calendar.GetBusyTime())
                 {
                     if (u.scheduled.Date == dateTimePicker1.Value.Date)
@@ -292,14 +296,14 @@ namespace timetable_app
                     u.display.Hide();
                 }
             }
-            calendar.OrderTasks(this);
+            calendar.OrderTasks(this, user);
             calendar.UpdateTaskListControl(this);
             calendar.OrderDisplay(this, user);
         }
 
         private void btnWeekView_Click(object sender, EventArgs e)
         {
-            var frm = new WeekViewForm(this, calendar);
+            var frm = new WeekViewForm(this, calendar, user);
             frm.ShowDialog();
         }
 
@@ -506,7 +510,7 @@ namespace timetable_app
         {
             completedTasks.Add(t);
         }
-        public void OrderTasks(Form1 form)
+        public void OrderTasks(Form1 form, User u)
         {
             if (tasks.Count > 0)
             {
@@ -516,7 +520,7 @@ namespace timetable_app
                 tasks = tasks.OrderByDescending(x => x.priority).ThenBy(x => x.earliestStartTime).ThenByDescending(x => x.duration).ToList();
                 if (tasks[0].fixedTime == false)
                 {
-                    tasks[0].time = 0;
+                    tasks[0].time = u.morningTime;
                 }
                 int j = 0;
 
@@ -527,7 +531,7 @@ namespace timetable_app
                         tasks = tasks[j].Ahead(tasks);
                         tasks = tasks[j].Behind(tasks);
                         tasks = tasks.OrderByDescending(x => x.priority).ThenBy(x => x.earliestStartTime).ThenByDescending(x => x.duration).ToList();
-                        tasks[j].time = 0;
+                        tasks[j].time = u.morningTime;
                         tasks[j].scheduled = DateTime.Today;
                         if (availableCheck(form, tasks[j]) == false)
                         {
@@ -536,12 +540,12 @@ namespace timetable_app
                                 tasks[j].time = Reschedule(tasks[j], a);
                             }
                             orderForDay(tasks[j], tasks, form);
-                            if (tasks[j].time + tasks[j].duration > 24)
+                            if (tasks[j].time + tasks[j].duration > u.nightTime)
                             {
                                 if (tasks[j].scheduled.AddDays(1).DayOfYear <= tasks[j].due.DayOfYear)
                                 {
                                     tasks[j].scheduled = tasks[j].scheduled.AddDays(1);
-                                    tasks[j].time = 0;
+                                    tasks[j].time = u.morningTime;
                                     orderForDay(tasks[j], tasks, form);
                                 }
                                 else
@@ -590,11 +594,13 @@ namespace timetable_app
         }
         public void OrderDisplay(Form1 form, User user)
         {
+            form.BackColor = user.calendarColour;
             foreach (AppLogic.Task t in tasks)
             {
                 if(t.GetType() != typeof(BusyTime))
                 {
                     t.display.BackColor = user.taskColour;
+                    t.display.Text = t.taskDescription;
                     foreach (object s in form.TaskList.Items)
                     {
                         if (Convert.ToString(s) == t.taskDescription)
@@ -650,6 +656,13 @@ namespace timetable_app
             formatter.Serialize(stream, busyTimes);
             stream.Close();
         }
+        public void SaveSettings(User user)
+        {
+            BinaryFormatter formatter = new BinaryFormatter();
+            Stream stream = new FileStream(@"UserPreferances.dat", FileMode.Create, FileAccess.Write);
+            formatter.Serialize(stream, user);
+            stream.Close();
+        }
 
         public void OpenTasksFromFile(Form1 form)
         {
@@ -677,7 +690,7 @@ namespace timetable_app
 
 
         }
-        public void loadBusyTime(Form1 form)
+        public void loadBusyTime(Form1 form, User user)
         {
             var filePath = @"NewFile.dat";
             if (!File.Exists(filePath))
@@ -697,7 +710,28 @@ namespace timetable_app
                 stream.Close();
 
             }
-            UpdateTaskListControl(form);
+            orderBusyTimeDisplay(this, user);
+        }
+        public void rememberPreferances(Form1 form, User user) // hope I can get this to work
+        {
+            var filePath = @"UserPreferances.dat";
+            if (!File.Exists(filePath))
+            {
+                var fileCreator = File.Create(filePath);
+                fileCreator.Close();
+            }
+            else
+            {
+                BinaryFormatter formatter = new BinaryFormatter();
+                Stream stream = new FileStream(@"UserPreferances.dat", FileMode.Open, FileAccess.Read);
+                if (stream.Length > 0)
+                {
+                    user = (User)formatter.Deserialize(stream);
+                }
+
+                stream.Close();
+
+            }
         }
         public void DeleteTasksFromFile(AppLogic.Task t)
         {
@@ -723,11 +757,11 @@ namespace timetable_app
             }
         }
 
-        public void Clearing(List<AppLogic.Task> tasks, Form1 form, User user)
+        public void Clearing(List<AppLogic.Task> tasks, Form1 form, User user) 
         {
             foreach (AppLogic.Task t in tasks)
             {
-                if (t.due.DayOfYear < DateTime.Now.DayOfYear)
+                if (t.due.Date < DateTime.Now.Date && t.completed == false)
                 {
                     form.Controls.Remove(t.display);
                     completedTasks.Add(t);
@@ -736,16 +770,22 @@ namespace timetable_app
                     form.Controls.Remove(t.display);
                     DeleteTasksFromFile(t);
                     SaveTasksToFile();
+                    MessageBox.Show("You either missed the deadline for " + t.name + " or forgot to mark it as completed, it has been removed from your calendar"); // made sure to include messages
                     if (tasks.Count != 0)
                     {
-                        this.OrderTasks(form);
+                        this.OrderTasks(form, user);
                         this.UpdateTaskListControl(form);
                         this.OrderDisplay(form, user);
                     }
                 }
-                if (t.scheduled.DayOfYear < DateTime.Now.DayOfYear)
+                if (t.scheduled.DayOfYear < DateTime.Now.DayOfYear) // so it doesn't just dissaper if the time passes
                 {
-                    this.OrderTasks(form);
+                    if(t.fixedTime == true)
+                    {
+                        t.fixedTime = false;
+                        MessageBox.Show("It is passed the fixed time for " + t.name + " but before the deadline so it has been reschedueled");
+                    }
+                    this.OrderTasks(form, user);
                     this.UpdateTaskListControl(form);
                     this.OrderDisplay(form, user);
                 }
@@ -777,7 +817,7 @@ namespace timetable_app
             }
             return number;
         }
-        public void orderForDay(AppLogic.Task t, List<AppLogic.Task> list, Form f)
+        public void orderForDay(AppLogic.Task t, List<AppLogic.Task> list, Form f) // so I don't have to repeat this code
         {
             int i = 0;
             int j = list.IndexOf(t);
@@ -817,7 +857,7 @@ namespace timetable_app
             {
                 if(u != t && u.scheduled.Date == t.scheduled.Date)
                 {
-                    if (u.fixedTime == true || (t.fixedTime == false && tasks.IndexOf(u) < tasks.IndexOf(t)))
+                    if (u.fixedTime == true || (t.fixedTime == false && tasks.IndexOf(u) < tasks.IndexOf(t) && u.priority >= t.priority)) // a lot of variables are at play here
                     {
                         if (t.time >= u.time && t.time < u.time + u.duration)
                         {
@@ -874,11 +914,12 @@ namespace timetable_app
             return avilable;
         }
 
-        public void orderBusyTimeDisplay(Calendar c, List<BusyTime> busyTimes) // I had this in the task class form but figured it would be better here
+        public void orderBusyTimeDisplay(Calendar c, User user) 
         {
             foreach (BusyTime u in busyTimes)
             {
                 int i = 0;
+                u.display.BackColor = user.busyTimeColour; 
                 while (i < busyTimes.IndexOf(u))
                 {
                     if (busyTimes[i].scheduled.Date == u.scheduled.Date && busyTimes[i] != u)
@@ -894,7 +935,7 @@ namespace timetable_app
                     }
                     i++;
                 }
-                foreach (AppLogic.Task t in c.GetTasks())
+                foreach (AppLogic.Task t in c.GetTasks()) 
                 {
                     if (t.scheduled.Date == u.scheduled.Date)
                     {
@@ -910,7 +951,7 @@ namespace timetable_app
                 }
             }
         }
-        public List<AppLogic.Task> Ahead(List<AppLogic.Task> list)
+        public List<AppLogic.Task> Ahead(List<AppLogic.Task> list) // I had this in the task class form but figured it would be better here
         {
             if (list.Count != 0)
             {

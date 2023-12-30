@@ -87,6 +87,12 @@
     <Compile Include="WeekViewForm.Designer.cs">
       <DependentUpon>WeekViewForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="YesNoForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="YesNoForm.Designer.cs">
+      <DependentUpon>YesNoForm.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="busyTimeForm.resx">
       <DependentUpon>busyTimeForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -114,6 +120,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="WeekViewForm.resx">
       <DependentUpon>WeekViewForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="YesNoForm.resx">
+      <DependentUpon>YesNoForm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

@@ -19,12 +19,17 @@ namespace timetable_app
     {
         Form1 sendingForm;
         Calendar calendar;
-        public TaskEntryForm(Form1 sendingForm, Calendar calendar)
+        User user;
+        public TaskEntryForm(Form1 sendingForm, Calendar calendar, User user)
         {
             InitializeComponent();
             this.calendar = calendar;
             this.sendingForm = sendingForm;
-            this.UpdateTaskSelector();
+            this.user = user;
+            UpdateTaskSelector();
+            maskedTextBox2.ValidatingType = typeof(double);
+            maskedTextBox3.ValidatingType = typeof(int);
+            maskedTextBox1.ValidatingType = typeof(double);
         }
 
 
@@ -43,19 +48,23 @@ namespace timetable_app
             task.fixedTime = false;
             if(checkBox1.Checked == true)
             {
-                if(calendar.availableCheck(sendingForm, task) == true)
-                {
-                    task.fixedTime = true;
-                    task.scheduled = dateTimePicker2.Value;
-                    if(maskedTextBox1 != null)
-                    {
-                        task.time = Convert.ToDouble(maskedTextBox1.Text);
-                    }
-                }
-                if(calendar.availableCheck(sendingForm, task) == false)
+                task.fixedTime = true;
+                task.scheduled = dateTimePicker2.Value;
+                task.time = Convert.ToDouble(maskedTextBox1.Text);
+                if(calendar.availableCheck(sendingForm, task) == false) // can't let them schedule it at an unavailable time
                 {
                     task.fixedTime = false;
                     MessageBox.Show("That time is not available, " + task.name + " will be reschedueled");
+                }
+                if(task.scheduled.Date < task.due.Date && task.fixedTime == true)
+                {
+                    task.fixedTime = false;
+                    MessageBox.Show("You can't schedule a task after it's due " + task.name + " will be reschedueled"); //made sure to include multiple error messages so they know what they did wrong
+                }
+                if (task.scheduled.Date < DateTime.Now.Date && task.fixedTime == true)
+                {
+                    task.fixedTime = false;
+                    MessageBox.Show("You can't schedule a task in the past " + task.name + " will be reschedueled");
                 }
             }
             
@@ -88,8 +97,9 @@ namespace timetable_app
             //https://code-maze.com/sort-list-by-object-property-dotnet/
             //sendingForm.tasks = sendingForm.tasks.OrderBy(x => x.name).ThenBy(x=>x.priority)ToList();
 
-            calendar.OrderTasks(sendingForm);
+            calendar.OrderTasks(sendingForm, user);
             calendar.UpdateTaskListControl(sendingForm);
+            calendar.OrderDisplay(sendingForm, user);
             calendar.SaveTasksToFile();
             Close();
         }
@@ -106,7 +116,7 @@ namespace timetable_app
                 int time = 0;
                 AppLogic.Task task = new AppLogic.Task(taskName, description, DateTime.Now, false, time, duration, priority, dateDue);
                 calendar.GetTasks().Add(task);
-                calendar.OrderTasks(sendingForm);
+                calendar.OrderTasks(sendingForm, user);
                 calendar.UpdateTaskListControl(sendingForm);
                 Close();
             }
@@ -154,6 +164,9 @@ namespace timetable_app
             dateTimePicker2.Enabled = false;
             label6.Visible = false;
             label8.Visible = false;
+            maskedTextBox2.ValidatingType = typeof(double);
+            maskedTextBox3.ValidatingType = typeof(int);
+            maskedTextBox1.ValidatingType = typeof(double);
         }
 
         private void checkedListBox1_SelectedIndexChanged(object sender, EventArgs e)

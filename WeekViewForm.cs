@@ -14,18 +14,20 @@ namespace timetable_app
     {
         Form1 originalForm;
         Calendar calendar;
+        User u;
         Label[,] labelsGrid;
         Label[] labelTimes;
         List<Label> labelTasks = new List<Label>();
         int width = 100;
         int height = 50;
-        int morning = 9;
-        int night = 9;
-        public WeekViewForm(Form1 originalForm, Calendar calendar)
+
+        public WeekViewForm(Form1 originalForm, Calendar calendar, User u)
         {
             InitializeComponent();
             this.originalForm = originalForm;
             this.calendar = calendar;
+            this.u = u;
+            BackColor = u.calendarColour;
         }
 
         private void WeekViewForm_Load(object sender, EventArgs e)
@@ -36,7 +38,7 @@ namespace timetable_app
                 l.BorderStyle = BorderStyle.FixedSingle;
                 l.Width = width;
                 l.Height = Convert.ToInt32(t.duration) * height;
-                int locY = 100 + ((Convert.ToInt32(t.time) - 9) * 50); //- 9 to account for array starting at 9am, 100+ because that's the location of the first box on y axis
+                int locY = 100 + ((Convert.ToInt32(t.time) - 9/*u.morningTime*/) * 50); //- 9 to account for array starting at 9am, 100+ because that's the location of the first box on y axis, that's outdated
                 switch (t.scheduled.DayOfWeek)
                 {
                     case DayOfWeek.Monday:
@@ -67,7 +69,7 @@ namespace timetable_app
                 l.BringToFront();
                 labelTasks.Add(l);
                 this.Controls.Add(l);
-                if(t.time < morning || t.time > night + 12)
+                if(t.time < u.morningTime || t.time > u.nightTime)
                 {
                     l.Hide();
                 }
@@ -92,7 +94,7 @@ namespace timetable_app
                 labelTimes[i] = l;
                 this.Controls.Add(l);
             }
-            labelsGrid = new Label[7, 12];
+            labelsGrid = new Label[7, 12/*u.nightTime - u.morningTime*/]; //I'll figure out a way to make it work
             for (int i = 0; i < labelsGrid.GetLength(0); i++)
             {
                 for(int j = 0; j < labelsGrid.GetLength(1); j++)
@@ -111,34 +113,5 @@ namespace timetable_app
             Console.WriteLine("boo");
         }
 
-        private void textBox1_TextChanged(object sender, EventArgs e)
-        {
-            if(textBox1.Text.GetType() == typeof(int))
-            {
-                if(Convert.ToInt32(textBox1.Text) < 12)
-                {
-                    morning = Convert.ToInt32(textBox1.Text);
-                }
-            }
-            if(textBox1.Text == null)
-            {
-                morning = 9;
-            }
-        }
-
-        private void textBox2_TextChanged(object sender, EventArgs e)
-        {
-            if(textBox2.Text.GetType() == typeof(int))
-            {
-                if(Convert.ToInt32(textBox2.Text) < 12)
-                {
-                    night = Convert.ToInt32(textBox2.Text);
-                }
-            }
-            if(textBox2.Text == null)
-            {
-                night = 9;
-            }
-        }
     }
 }

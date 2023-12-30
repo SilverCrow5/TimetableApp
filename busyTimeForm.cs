@@ -133,9 +133,10 @@ namespace timetable_app
                 MessageBox.Show("You alrady have a task schedueled at that time");
             }
 
-            sendingForm.GetCalendar().OrderTasks(sendingForm);
-            sendingForm.GetCalendar().OrderDisplay(sendingForm, user);
-            sendingForm.GetCalendar().UpdateTaskListControl(sendingForm);
+            calendar.OrderTasks(sendingForm, user);
+            calendar.OrderDisplay(sendingForm, user);
+            calendar.UpdateTaskListControl(sendingForm);
+            calendar.orderBusyTimeDisplay(calendar, user);
 
             Close();
             

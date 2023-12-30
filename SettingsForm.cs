@@ -64,7 +64,7 @@ namespace timetable_app
 
             if(maskedTextBox1.Text != null && Convert.ToInt32(maskedTextBox1.Text) < 24 && Convert.ToInt32(maskedTextBox1.Text) >= 0 && Convert.ToInt32(maskedTextBox1.Text) < Convert.ToInt32(maskedTextBox2.Text))
             {
-                u.morningTime = Convert.ToInt32(maskedTextBox1.Text);
+                u.morningTime = Convert.ToInt32(maskedTextBox1.Text); //there must be a more efficient way to do this
             }
             if(maskedTextBox1.Text == null || Convert.ToInt32(maskedTextBox1.Text) >= 24 || Convert.ToInt32(maskedTextBox1.Text) < 0 || Convert.ToInt32(maskedTextBox1.Text) >= Convert.ToInt32(maskedTextBox2.Text)) //this is pretty long but it would be to many lines if I had them as individual conditions
             {
@@ -79,8 +79,14 @@ namespace timetable_app
             {
                 u.nightTime = 0;
                 MessageBox.Show("you either left the night time box blank, set it to an hour that doesen't exist or made it before the night time, so it's been sent to 00:00");
+                
             }
 
+            c.OrderTasks(f, u);
+            c.UpdateTaskListControl(f);
+            c.OrderDisplay(f, u);
+            c.orderBusyTimeDisplay(c, u);
+            c.SaveSettings(u);
             Close();
 
         }
@@ -128,6 +134,10 @@ namespace timetable_app
             {
                 c = Color.Pink;
             }
+            if(text == "Light grey")
+            {
+                c = DefaultBackColor;
+            }
             return c;
         }
 
@@ -174,12 +184,25 @@ namespace timetable_app
             {
                 colour = "Pink";
             }
+            if(c == DefaultBackColor)
+            {
+                colour = "Light grey";
+            }
             return colour;
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
             Close();
+        }
+
+        private void button3_Click(object sender, EventArgs e) // because most settings menus have this option and I hate when they don't
+        {
+            maskedTextBox1.Text = "0";
+            maskedTextBox2.Text = "24";
+            comboBox1.Text = "Light blue";
+            comboBox2.Text = "Red";
+            comboBox3.Text = "Light grey";
         }
     }
 }
