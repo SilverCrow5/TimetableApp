@@ -103,28 +103,6 @@ namespace timetable_app
             calendar.SaveTasksToFile();
             Close();
         }
-        private void TaskEntryForm_KeyDown(object sender, PreviewKeyDownEventArgs e)
-        {
-            if (e.KeyData == Keys.Enter)
-            {
-                string taskName = textBox1.Text;
-                string description = textBox2.Text;
-                DateTime dateDue = new DateTime();
-                dateDue = dateTimePicker1.Value.Date;
-                int duration = Convert.ToInt32(maskedTextBox2.Text);
-                int priority = Convert.ToInt32(maskedTextBox3.Text);
-                int time = 0;
-                AppLogic.Task task = new AppLogic.Task(taskName, description, DateTime.Now, false, time, duration, priority, dateDue);
-                calendar.GetTasks().Add(task);
-                calendar.OrderTasks(sendingForm, user);
-                calendar.UpdateTaskListControl(sendingForm);
-                Close();
-            }
-            if (e.KeyData == Keys.Escape)
-            {
-                Close();
-            }
-        }
 
         public void UpdateTaskSelector()
         {
@@ -153,9 +131,10 @@ namespace timetable_app
 
         }
 
+
         private void TaskEntryForm_Load(object sender, EventArgs e)
         {
-            this.PreviewKeyDown += TaskEntryForm_KeyDown;
+            this.KeyDown += TaskEntryForm_KeyDown;
             this.UpdateTaskSelector();
             maskedTextBox1.Visible = false;
             maskedTextBox1.Enabled = false;
@@ -207,6 +186,29 @@ namespace timetable_app
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void TaskEntryForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyData == Keys.Enter)
+            {
+                string taskName = textBox1.Text;
+                string description = textBox2.Text;
+                DateTime dateDue = new DateTime();
+                dateDue = dateTimePicker1.Value.Date;
+                int duration = Convert.ToInt32(maskedTextBox2.Text);
+                int priority = Convert.ToInt32(maskedTextBox3.Text);
+                int time = 0;
+                AppLogic.Task task = new AppLogic.Task(taskName, description, DateTime.Now, false, time, duration, priority, dateDue);
+                calendar.GetTasks().Add(task);
+                calendar.OrderTasks(sendingForm, user);
+                calendar.UpdateTaskListControl(sendingForm);
+                Close();
+            }
+            if (e.KeyData == Keys.Escape)
+            {
+                Close();
+            }
         }
     }
 

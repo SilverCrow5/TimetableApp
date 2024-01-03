@@ -37,55 +37,65 @@ namespace timetable_app
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if (comboBox1.Text != null)
+            if (comboBox1.Text != "")
             {
                 u.taskColour = colour(comboBox1.Text);
             }
-            if(comboBox1.Text == null)
+            if(comboBox1.Text == "")
             {
                 u.taskColour = Color.AliceBlue;
             }
-            if (comboBox2.Text != null)
+            if (comboBox2.Text != "")
             {
                 u.busyTimeColour = colour(comboBox2.Text);
             }
-            if(comboBox2.Text == null)
+            if(comboBox2.Text == "")
             {
                 u.busyTimeColour = Color.Red;
             }
-            if(comboBox3.Text != null)
+            if(comboBox3.Text != "")
             {
                 u.calendarColour = colour(comboBox3.Text);
             }
-            if(comboBox3.Text == null)
+            if(comboBox3.Text == "")
             {
-                u.calendarColour = Color.Gray;
+                u.calendarColour = DefaultBackColor;
+            }
+            if(maskedTextBox1.Text == "")
+            {
+                maskedTextBox1.Text = "0";
+            }
+            if(maskedTextBox2.Text == "")
+            {
+                maskedTextBox2.Text = "24";
             }
 
-            if(maskedTextBox1.Text != null && Convert.ToInt32(maskedTextBox1.Text) < 24 && Convert.ToInt32(maskedTextBox1.Text) >= 0 && Convert.ToInt32(maskedTextBox1.Text) < Convert.ToInt32(maskedTextBox2.Text))
+            if(maskedTextBox1.Text != "" && Convert.ToInt32(maskedTextBox1.Text) < 24 && Convert.ToInt32(maskedTextBox1.Text) >= 0 && Convert.ToInt32(maskedTextBox1.Text) < Convert.ToInt32(maskedTextBox2.Text))
             {
                 u.morningTime = Convert.ToInt32(maskedTextBox1.Text); //there must be a more efficient way to do this
             }
-            if(maskedTextBox1.Text == null || Convert.ToInt32(maskedTextBox1.Text) >= 24 || Convert.ToInt32(maskedTextBox1.Text) < 0 || Convert.ToInt32(maskedTextBox1.Text) >= Convert.ToInt32(maskedTextBox2.Text)) //this is pretty long but it would be to many lines if I had them as individual conditions
+            if(maskedTextBox1.Text == "" || Convert.ToInt32(maskedTextBox1.Text) >= 24 || Convert.ToInt32(maskedTextBox1.Text) < 0 || Convert.ToInt32(maskedTextBox1.Text) >= Convert.ToInt32(maskedTextBox2.Text)) //this is pretty long but it would be to many lines if I had them as individual conditions
             {
                 u.morningTime = 0;
                 MessageBox.Show("you either left the morning time box blank, set it to an hour that doesen't exist or made it after the night time, so it's been set to 00:00");
+                maskedTextBox1.Text = "0";
             }
-            if(maskedTextBox2.Text != null && Convert.ToInt32(maskedTextBox2.Text) <= 24 && Convert.ToInt32(maskedTextBox2.Text) > 0 && Convert.ToInt32(maskedTextBox1.Text) < Convert.ToInt32(maskedTextBox2.Text))
+            if(maskedTextBox2.Text != "" && Convert.ToInt32(maskedTextBox2.Text) <= 24 && Convert.ToInt32(maskedTextBox2.Text) > 0 && Convert.ToInt32(maskedTextBox1.Text) < Convert.ToInt32(maskedTextBox2.Text))
             {
                 u.nightTime = Convert.ToInt32(maskedTextBox2.Text);
             }
-            if (maskedTextBox2.Text == null || Convert.ToInt32(maskedTextBox2.Text) > 24 || Convert.ToInt32(maskedTextBox2.Text) <= 0 || Convert.ToInt32(maskedTextBox1.Text) >= Convert.ToInt32(maskedTextBox2.Text))
+            if (maskedTextBox2.Text == "" || Convert.ToInt32(maskedTextBox2.Text) > 24 || Convert.ToInt32(maskedTextBox2.Text) <= 0 || Convert.ToInt32(maskedTextBox1.Text) >= Convert.ToInt32(maskedTextBox2.Text))
             {
                 u.nightTime = 0;
                 MessageBox.Show("you either left the night time box blank, set it to an hour that doesen't exist or made it before the night time, so it's been sent to 00:00");
+                maskedTextBox2.Text = "24";
                 
             }
 
             c.OrderTasks(f, u);
             c.UpdateTaskListControl(f);
             c.OrderDisplay(f, u);
-            c.orderBusyTimeDisplay(c, u);
+            c.orderBusyTimeDisplay(u, f);
             c.SaveSettings(u);
             Close();
 
@@ -138,6 +148,10 @@ namespace timetable_app
             {
                 c = DefaultBackColor;
             }
+            if(text == "Light green")
+            {
+                c = Color.LightGreen;
+            }
             return c;
         }
 
@@ -188,6 +202,10 @@ namespace timetable_app
             {
                 colour = "Light grey";
             }
+            if(c == Color.LightGreen)
+            {
+                colour = "Light green";
+            }
             return colour;
         }
 
@@ -203,6 +221,16 @@ namespace timetable_app
             comboBox1.Text = "Light blue";
             comboBox2.Text = "Red";
             comboBox3.Text = "Light grey";
+        }
+
+        private void maskedTextBox1_MaskInputRejected(object sender, MaskInputRejectedEventArgs e)
+        {
+            maskedTextBox1.Text = "0";
+        }
+
+        private void maskedTextBox2_MaskInputRejected(object sender, MaskInputRejectedEventArgs e)
+        {
+            maskedTextBox2.Text = "24";
         }
     }
 }

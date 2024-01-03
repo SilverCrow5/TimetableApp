@@ -25,7 +25,7 @@ namespace timetable_app
             this.t = t;
             this.f = f;
             this.c = c;
-            this.c = c;
+            this.u = u;
             Text = "Mark " + t.name + " as completed";
         }
 
@@ -50,7 +50,7 @@ namespace timetable_app
                 c.OrderTasks(f, u);
                 c.UpdateTaskListControl(f);
             }
-            c.orderBusyTimeDisplay(c, u);
+            c.orderBusyTimeDisplay(u, f);
             c.OrderDisplay(f, u);
 
             if(te != null)

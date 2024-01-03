@@ -58,6 +58,7 @@
             this.maskedTextBox1.Name = "maskedTextBox1";
             this.maskedTextBox1.Size = new System.Drawing.Size(100, 20);
             this.maskedTextBox1.TabIndex = 1;
+            this.maskedTextBox1.MaskInputRejected += new System.Windows.Forms.MaskInputRejectedEventHandler(this.maskedTextBox1_MaskInputRejected);
             // 
             // label2
             // 
@@ -74,6 +75,7 @@
             this.maskedTextBox2.Name = "maskedTextBox2";
             this.maskedTextBox2.Size = new System.Drawing.Size(100, 20);
             this.maskedTextBox2.TabIndex = 3;
+            this.maskedTextBox2.MaskInputRejected += new System.Windows.Forms.MaskInputRejectedEventHandler(this.maskedTextBox2_MaskInputRejected);
             // 
             // comboBox1
             // 
@@ -90,7 +92,8 @@
             "Light blue",
             "Maroon",
             "Pink",
-            "Light grey"});
+            "Light grey",
+            "Light green"});
             this.comboBox1.Location = new System.Drawing.Point(413, 59);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(121, 21);
@@ -111,7 +114,8 @@
             "Light blue",
             "Maroon",
             "Pink",
-            "Light grey"});
+            "Light grey",
+            "Light green"});
             this.comboBox2.Location = new System.Drawing.Point(413, 138);
             this.comboBox2.Name = "comboBox2";
             this.comboBox2.Size = new System.Drawing.Size(121, 21);
@@ -132,7 +136,8 @@
             "Light blue",
             "Maroon",
             "Pink",
-            "Light grey"});
+            "Light grey",
+            "Light green"});
             this.comboBox3.Location = new System.Drawing.Point(413, 215);
             this.comboBox3.Name = "comboBox3";
             this.comboBox3.Size = new System.Drawing.Size(121, 21);

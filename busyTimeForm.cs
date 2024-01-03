@@ -73,6 +73,8 @@ namespace timetable_app
             dateTimePicker1.Enabled = false;
             checkedListBox1.Hide();
             checkedListBox1.Enabled = false;
+            label6.Hide();
+            label7.Hide();
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -101,6 +103,8 @@ namespace timetable_app
                 one.endTime = one.startTime + Convert.ToInt32(one.duration);
             }
             one.endTime = Convert.ToInt32(textBox3.Text);
+            one.daysofWeek = new List<string>();
+            one.repeatDates = new List<DateTime>();
             if(checkBox1.Checked == true)
             {
                 foreach(string s in checkedListBox1.CheckedItems)
@@ -118,7 +122,7 @@ namespace timetable_app
             one.display.Width = 100 + 10 * Convert.ToInt32(duration);
             one.display.Height = 100;
             one.display.Location = new Point(100, 100);
-            one.display.BackColor = Color.Red;
+            one.display.BackColor = user.busyTimeColour;
             one.display.BorderStyle = BorderStyle.Fixed3D;
             one.scheduled = dateTimePicker2.Value;
 
@@ -133,10 +137,13 @@ namespace timetable_app
                 MessageBox.Show("You alrady have a task schedueled at that time");
             }
 
+            one.setRepeatDates();
+            one.addRepeats(calendar, user);
+
             calendar.OrderTasks(sendingForm, user);
             calendar.OrderDisplay(sendingForm, user);
             calendar.UpdateTaskListControl(sendingForm);
-            calendar.orderBusyTimeDisplay(calendar, user);
+            calendar.orderBusyTimeDisplay(user, sendingForm);
 
             Close();
             
@@ -150,6 +157,8 @@ namespace timetable_app
                 dateTimePicker1.Enabled = true;
                 checkedListBox1.Show();
                 checkedListBox1.Enabled = true;
+                label6.Show();
+                label7.Show();
             }
             if(checkBox1.Checked == false)
             {
@@ -157,6 +166,8 @@ namespace timetable_app
                 dateTimePicker1.Enabled = false;
                 checkedListBox1.Hide();
                 checkedListBox1.Enabled = false;
+                label6.Hide();
+                label7.Hide();
             }
         }
 

@@ -42,7 +42,10 @@ namespace timetable_app
             {
                 foreach (AppLogic.Task u in mainForm.GetCalendar().GetTasks())
                 {
-                    checkedListBox1.Items.Add(u);
+                    if (u != t)
+                    {
+                        checkedListBox1.Items.Add(u);
+                    }
                     if (t.predecessors2.Contains(u.ID))
                     {
                         checkedListBox1.SetItemChecked(checkedListBox1.Items.IndexOf(u), true);

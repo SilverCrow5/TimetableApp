@@ -20,6 +20,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 using System.Xml.Linq;
 using timetable_app.AppLogic;
 using System.Security.Cryptography;
+using System.Security.Policy;
 
 namespace timetable_app
 {
@@ -67,7 +68,7 @@ namespace timetable_app
         {
             //TaskList.PreviewKeyDown += TaskList_KeyDown;
             calendar.OpenTasksFromFile(this);
-            calendar.rememberPreferances(this, user);
+            user = calendar.rememberPreferances(this, user);
             calendar.OrderTasks(this, user);
             calendar.UpdateTaskListControl(this);
             calendar.OrderDisplay(this, user);
@@ -124,7 +125,7 @@ namespace timetable_app
                     calendar.OrderTasks(this, user);
                     calendar.UpdateTaskListControl(this);
                     calendar.OrderDisplay(this, user);
-                    calendar.orderBusyTimeDisplay(calendar, user);
+                    calendar.orderBusyTimeDisplay(user, this);
                     this.Controls.Add(current.display);
                     if (TaskList.SelectedIndex > 0)
                     {
@@ -187,12 +188,13 @@ namespace timetable_app
         {
             return calendar;
         }
-        private void dateTimePicker1_ValueChanged(object sender, EventArgs e)
+        private void dateTimePicker1_ValueChanged(object sender, EventArgs e) // so the display can be correct for each day
         {
 
             //calendar.OrderTasks(this);
             calendar.UpdateTaskListControl(this);
             calendar.OrderDisplay(this, user);
+            calendar.orderBusyTimeDisplay(user, this); 
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -248,7 +250,7 @@ namespace timetable_app
                         t.display.Visible = true;
                     }
                 }*/
-                calendar.orderBusyTimeDisplay(calendar, user);
+                calendar.orderBusyTimeDisplay(user, this);
                 foreach (BusyTime u in calendar.GetBusyTime())
                 {
                     if (u.scheduled.Date == dateTimePicker1.Value.Date)
@@ -296,7 +298,7 @@ namespace timetable_app
                     u.display.Hide();
                 }
             }
-            calendar.OrderTasks(this, user);
+            calendar.OrderTasks(this, user); //need this twice so it can be sorted before the busy times are ordered and sort them again afterwards
             calendar.UpdateTaskListControl(this);
             calendar.OrderDisplay(this, user);
         }
@@ -552,7 +554,10 @@ namespace timetable_app
                                 {
                                     MessageBox.Show("There is not enough time to schedule them all");
                                     tasks.Remove(lastAdded);
-                                    j--;
+                                    if (j <= tasks.IndexOf(lastAdded)) // I think this works
+                                    {
+                                        j--;
+                                    }
                                 }
                                 //OrderTasks(); makes it all go wrong
                             }
@@ -644,7 +649,7 @@ namespace timetable_app
             Stream stream = new FileStream(@"ExampleNew.dat", FileMode.Create, FileAccess.Write);
             //foreach (Task t in tasks)
             //{
-            //    formatter.Serialize(stream, t); //this doesen't work with labels so I have to disable it when leables are enabled until I can fix it
+            //    formatter.Serialize(stream, t); //this doesen't work with labels so I have to disable it when lables are enabled until I can fix it and now I don't need it
             //}
             formatter.Serialize(stream, tasks);
             stream.Close();
@@ -710,9 +715,9 @@ namespace timetable_app
                 stream.Close();
 
             }
-            orderBusyTimeDisplay(this, user);
+            orderBusyTimeDisplay(user, form);
         }
-        public void rememberPreferances(Form1 form, User user) // hope I can get this to work
+        public User rememberPreferances(Form1 form, AppLogic.User user) // hope I can get this to work
         {
             var filePath = @"UserPreferances.dat";
             if (!File.Exists(filePath))
@@ -726,12 +731,13 @@ namespace timetable_app
                 Stream stream = new FileStream(@"UserPreferances.dat", FileMode.Open, FileAccess.Read);
                 if (stream.Length > 0)
                 {
-                    user = (User)formatter.Deserialize(stream);
+                    user = (AppLogic.User)formatter.Deserialize(stream);
                 }
 
                 stream.Close();
 
             }
+            return user; //I had to add this so that it would work, the changes wouldn't save when it was a void
         }
         public void DeleteTasksFromFile(AppLogic.Task t)
         {
@@ -771,12 +777,12 @@ namespace timetable_app
                     DeleteTasksFromFile(t);
                     SaveTasksToFile();
                     MessageBox.Show("You either missed the deadline for " + t.name + " or forgot to mark it as completed, it has been removed from your calendar"); // made sure to include messages
-                    if (tasks.Count != 0)
+                    /*if (tasks.Count != 0)
                     {
-                        this.OrderTasks(form, user);
+                        this.OrderTasks(form, user); //thought it would take too long if they were here, might un-comment them if I realise I need them
                         this.UpdateTaskListControl(form);
                         this.OrderDisplay(form, user);
-                    }
+                    }*/
                 }
                 if (t.scheduled.DayOfYear < DateTime.Now.DayOfYear) // so it doesn't just dissaper if the time passes
                 {
@@ -785,10 +791,16 @@ namespace timetable_app
                         t.fixedTime = false;
                         MessageBox.Show("It is passed the fixed time for " + t.name + " but before the deadline so it has been reschedueled");
                     }
-                    this.OrderTasks(form, user);
-                    this.UpdateTaskListControl(form);
-                    this.OrderDisplay(form, user);
+                    //this.OrderTasks(form, user);
+                    //this.UpdateTaskListControl(form);
+                    //this.OrderDisplay(form, user);
                 }
+            }
+            if (tasks.Count != 0)
+            {
+                this.OrderTasks(form, user);
+                this.UpdateTaskListControl(form);
+                this.OrderDisplay(form, user);
             }
         }
         public double Reschedule(AppLogic.Task t, BusyTime a)
@@ -914,7 +926,7 @@ namespace timetable_app
             return avilable;
         }
 
-        public void orderBusyTimeDisplay(Calendar c, User user) 
+        public void orderBusyTimeDisplay(User user, Form1 f) 
         {
             foreach (BusyTime u in busyTimes)
             {
@@ -935,7 +947,7 @@ namespace timetable_app
                     }
                     i++;
                 }
-                foreach (AppLogic.Task t in c.GetTasks()) 
+                foreach (AppLogic.Task t in tasks)  // decided to remove the need for it to take in a calendar instance and did this, hope that doesen't cause any problems
                 {
                     if (t.scheduled.Date == u.scheduled.Date)
                     {
@@ -948,6 +960,12 @@ namespace timetable_app
                             t.display.Location = new Point(u.display.Location.X + u.display.Width, u.display.Location.Y);
                         }
                     }
+                }
+                f.Controls.Add(u.display);
+                u.display.Visible = false;
+                if(u.scheduled.Date == f.dateTimePicker1.Value.Date && f.checkBox1.Checked == true)
+                {
+                    u.display.Visible = true; //can't belive I went so long forgetting to put that in
                 }
             }
         }
@@ -1049,6 +1067,7 @@ namespace timetable_app
         public List<DateTime> repeatDates;
         public DateTime repeatEndDate;
         public Label display;
+        public BusyTime repeatOf;
         public BusyTime(string name, DateTime scheduled, bool completed, double time, double duration, bool repeating) : base(name, scheduled, duration, time, completed)
         {
             startTime = Convert.ToInt32(time);
@@ -1059,6 +1078,11 @@ namespace timetable_app
             this.daysofWeek = daysofWeek;
             this.repeatDates = repeatDates;
             this.endTime = endTime;
+
+            this.scheduled = scheduled;
+            this.duration = duration;
+            this.time = time;
+            this.fixedTime = true;
 
 
             display = new Label();
@@ -1072,21 +1096,40 @@ namespace timetable_app
         }
         public void setRepeatDates()
         {
-            DateTime i = DateTime.Now;
-            while(i.DayOfYear < repeatEndDate.DayOfYear)
+            DateTime i = scheduled.AddDays(1);
+            while(i.Date < repeatEndDate.Date) //goes tehrought the days from now to the end time of teh repetition
             {
                 foreach(string s in daysofWeek)
                 {
                     if(i.DayOfWeek.ToString() == s)
                     {
-                        repeatDates.Add(i);
+                        repeatDates.Add(i); // addes the dates if they correspond to the selected days of the week
                     }
                 }
-                i.AddDays(1);
+                i = i.AddDays(1);
+            }
+        }
+        public void addRepeats(Calendar c, User u) //suprised this works
+        {
+            foreach(DateTime i in repeatDates)
+            {
+                BusyTime b = new BusyTime(name, i, false, time, duration, false); // makes a new busy time instance with similar properties for every repeat
+                b.repeatOf = this; // might need this for when I make it so you can remove busy time
+                b.startTime = Convert.ToInt16(b.time);
+                b.endTime = b.startTime + Convert.ToInt16(b.duration);
+
+                b.display = new Label();
+                b.display.Text = "nothing schedueled: " + (b.startTime - (b.startTime % 1)) + ":" + (b.startTime % 1 * 60) + " - " + (b.endTime - (b.endTime % 1)) + ":" + ((b.endTime % 1) * 60);
+                b.display.Width = 100 + 10 * Convert.ToInt32(duration);
+                b.display.Height = 100;
+                b.display.Location = new Point(100, 100);
+                b.display.BackColor = u.busyTimeColour;
+                b.display.BorderStyle = BorderStyle.Fixed3D;
+
+                c.GetBusyTime().Add(b); // just to make it appear on different days when there's repeats, hope this doesn't cause any problems
             }
         }
     }
-
     public class Event : AppLogic.Task
     {
         public Event(string name, DateTime scheduled, bool completed, double time, double duration) : base(name, scheduled, duration, time, completed)
@@ -1098,10 +1141,7 @@ namespace timetable_app
             this.completed = false;
         }
     }
-
-
-
-}    
+}
 
 
 // I've had enough of this shit

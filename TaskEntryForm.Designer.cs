@@ -254,6 +254,7 @@
             this.Name = "TaskEntryForm";
             this.Text = "enter new task";
             this.Load += new System.EventHandler(this.TaskEntryForm_Load);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TaskEntryForm_KeyDown);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);

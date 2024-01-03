@@ -144,9 +144,9 @@
         public System.Windows.Forms.ListBox TaskList;
         public System.Windows.Forms.DateTimePicker dateTimePicker1;
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.Button btnWeekView;
         private System.Windows.Forms.Button button3;
+        public System.Windows.Forms.CheckBox checkBox1;
     }
 }
 
