@@ -144,6 +144,7 @@ namespace timetable_app
             calendar.OrderDisplay(sendingForm, user);
             calendar.UpdateTaskListControl(sendingForm);
             calendar.orderBusyTimeDisplay(user, sendingForm);
+            calendar.OrderDisplay(sendingForm, user);
 
             Close();
             
